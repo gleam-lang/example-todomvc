@@ -1,24 +1,11 @@
 # todomvc
 
-[![Package Version](https://img.shields.io/hexpm/v/todomvc)](https://hex.pm/packages/todomvc)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/todomvc/)
+A backend based implementation of [TodoMVC][todomvc] and an example Gleam
+project.
 
-A Gleam project
-
-## Quick start
+[todomvc]: https://todomvc.com/
 
 ```sh
-gleam run   # Run the project
+gleam run   # Run the web app
 gleam test  # Run the tests
-gleam shell # Run an Erlang shell
 ```
-
-## Installation
-
-If available on Hex this package can be added to your Gleam project:
-
-```sh
-gleam add todomvc
-```
-
-and its documentation can be found at <https://hexdocs.pm/todomvc>.
