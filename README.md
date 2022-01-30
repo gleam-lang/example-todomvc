@@ -9,3 +9,6 @@ project.
 gleam run   # Run the web app
 gleam test  # Run the tests
 ```
+
+Special thanks to [GregGreg](https://gitlab.com/greggreg/gleam_todo) for the
+first version of TodoMVC in Gleam.
