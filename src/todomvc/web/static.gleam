@@ -6,10 +6,9 @@ import gleam/bit_builder.{BitBuilder}
 import gleam/result
 import gleam/string
 
-// TODO: test
 // TODO: Use the Erlang priv dir helper perhaps? That would require Gleam users
 // to think about OTP application names, which may not be the nicest experience.
-// Perhaps refine this and extract this into a library.
+// We could also extract this into a library once we are happy with the API.
 pub fn middleware(service: Service(in, BitBuilder)) -> Service(in, BitBuilder) {
   fn(request: Request(in)) -> Response(BitBuilder) {
     case get_asset(request) {
