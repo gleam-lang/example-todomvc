@@ -2,6 +2,7 @@ import gleam/http/request.{Request}
 import gleam/http/response.{Response}
 import gleam/http/service.{Service}
 import gleam/bit_builder.{BitBuilder}
+import todomvc/item.{Item}
 import todomvc/web/static
 import todomvc/web/logger
 import todomvc/web/templates/home as home_template
@@ -16,7 +17,9 @@ fn router(request: Request(BitString)) -> Response(BitBuilder) {
 }
 
 fn home() {
-  let html = home_template.render_builder()
+  let items = [Item(id: 1, completed: False, text: "Write TodoMVC in Gleam")]
+  let html = home_template.render_builder(items)
+
   response.new(200)
   |> response.set_body(html)
   |> response.map(bit_builder.from_string_builder)

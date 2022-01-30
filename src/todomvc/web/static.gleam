@@ -1,8 +1,8 @@
 import gleam/http/response.{Response}
 import gleam/http/request.{Request}
 import gleam/http/service.{Service}
-import gleam/erlang/file
 import gleam/bit_builder.{BitBuilder}
+import gleam/erlang/file
 import gleam/result
 import gleam/string
 
