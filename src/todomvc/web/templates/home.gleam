@@ -1,11 +1,13 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
-
 import todomvc/item.{Item}
 
 pub fn render_builder(items items: List(Item)) -> StringBuilder {
-    let builder = string_builder.from_string("")
-    let builder = string_builder.append(builder, "
+  let builder = string_builder.from_string("")
+  let builder =
+    string_builder.append(
+      builder,
+      "
 <!DOCTYPE html>
 <html lang=\"en\">
 <head>
@@ -51,9 +53,17 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
       </header>
       <section class=\"main\">
         <ul class=\"todo-list\">
-          ")
-    let builder = list.fold(items, builder, fn(builder, item) {
-            let builder = string_builder.append(builder, "
+          ",
+    )
+  let builder =
+    list.fold(
+      items,
+      builder,
+      fn(builder, item) {
+        let builder =
+          string_builder.append(
+            builder,
+            "
           <li class=\"completed\">
             <div class=\"view\">
               <!-- TODO: edit -->
@@ -65,11 +75,16 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
               <!-- TODO: toggle completion -->
               <form class=\"todo-mark\" method=\"post\" action=\"/mark/active/08680FDA-9B22-4ADE-8E9B-23F54178A89E\"><button></button></form>
             </div>
-          ")
+          ",
+          )
 
         builder
-})
-    let builder = string_builder.append(builder, "
+      },
+    )
+  let builder =
+    string_builder.append(
+      builder,
+      "
         </ul>
       </section>
       <!-- TODO: filters -->
@@ -96,11 +111,12 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
   </div>
 </body>
 </html>
-")
+",
+    )
 
-    builder
+  builder
 }
 
 pub fn render(items items: List(Item)) -> String {
-    string_builder.to_string(render_builder(items: items))
+  string_builder.to_string(render_builder(items: items))
 }
