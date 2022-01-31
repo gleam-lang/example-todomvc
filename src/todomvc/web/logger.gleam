@@ -31,10 +31,7 @@ pub fn middleware(service: Service(a, b)) -> Service(a, b) {
     let before = now()
     let response = service(request)
     let elapsed = convert_time_unit(now() - before, Native, Microsecond)
-    case elapsed < 100 {
-      True -> io.println(format_log_line(request, response, elapsed))
-      False -> Nil
-    }
+    io.println(format_log_line(request, response, elapsed))
     response
   }
 }
