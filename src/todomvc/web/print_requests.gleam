@@ -12,6 +12,11 @@ fn format_log_line(
   response: Response(b),
   elapsed: Int,
 ) -> String {
+  let elapsed = case elapsed > 1000 {
+    True -> string.append(int.to_string(elapsed / 1000), "ms")
+    False -> string.append(int.to_string(elapsed), "µs")
+  }
+
   string.concat([
     request.method
     |> http.method_to_string
@@ -21,8 +26,7 @@ fn format_log_line(
     " ",
     int.to_string(response.status),
     " sent in ",
-    int.to_string(elapsed),
-    "µs",
+    elapsed,
   ])
 }
 

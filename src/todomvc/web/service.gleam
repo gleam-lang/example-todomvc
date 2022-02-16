@@ -10,7 +10,7 @@ import todomvc/web/templates/item_deleted as item_deleted_template
 import todomvc/item.{Item}
 import todomvc/web
 import todomvc/web/static
-import todomvc/web/logger
+import todomvc/web/print_requests
 
 pub fn router(request: Request(BitString)) -> web.Result {
   case request.path_segments(request) {
@@ -28,7 +28,7 @@ pub fn stack() -> Service(BitString, BitBuilder) {
   |> function.compose(web.result_to_response)
   |> service.prepend_response_header("made-with", "Gleam")
   |> service.map_response_body(bit_builder.from_string_builder)
-  |> logger.middleware
+  |> print_requests.middleware
   |> static.middleware()
 }
 
@@ -91,7 +91,7 @@ fn todo_item(request: Request(BitString), id: String) -> web.Result {
   }
 }
 
-fn delete_item(request: Request(BitString), _id: String) -> web.Result {
+fn delete_item(_request: Request(BitString), _id: String) -> web.Result {
   // TODO: delete item
   item_deleted_template.render_builder(
     // TODO: count
