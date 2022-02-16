@@ -3,7 +3,7 @@
 {> with remaining_count as Int
 {> with can_clear_completed as Bool
 
-{> import todomvc/web/templates/item as item_template
+{> import todomvc/templates/item as item_template
 {> import todomvc/item.{Item}
 {> import gleam/int
 

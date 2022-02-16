@@ -1,6 +1,6 @@
 {> with items as List(Item)
 
-{> import todomvc/web/templates/item as item_template
+{> import todomvc/templates/item as item_template
 {> import todomvc/item.{Item}
 {> import gleam/result
 {> import gleam/list

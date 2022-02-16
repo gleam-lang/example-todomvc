@@ -4,9 +4,9 @@ import gleam/http/request.{Request}
 import gleam/http/response
 import gleam/http
 import gleam/function
-import todomvc/web/templates/home as home_template
-import todomvc/web/templates/item_created as item_created_template
-import todomvc/web/templates/item_deleted as item_deleted_template
+import todomvc/templates/home as home_template
+import todomvc/templates/item_created as item_created_template
+import todomvc/templates/item_deleted as item_deleted_template
 import todomvc/item.{Item}
 import todomvc/web
 import todomvc/web/static
@@ -66,7 +66,7 @@ fn todos(request: Request(BitString)) -> web.Result {
   }
 }
 
-fn create_todo(request: Request(BitString)) -> web.Result {
+fn create_todo(_request: Request(BitString)) -> web.Result {
   // TODO: create item
   let item = Item(id: 5, completed: False, content: "wibble")
   item_created_template.render_builder(

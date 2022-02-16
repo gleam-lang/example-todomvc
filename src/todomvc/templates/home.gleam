@@ -1,6 +1,6 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
-import todomvc/web/templates/item as item_template
+import todomvc/templates/item as item_template
 import todomvc/item.{Item}
 import gleam/result
 import gleam/list
