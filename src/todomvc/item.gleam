@@ -1,3 +1,3 @@
 pub type Item {
-  Item(id: Int, completed: Bool, text: String)
+  Item(id: Int, completed: Bool, content: String)
 }

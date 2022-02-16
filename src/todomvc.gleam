@@ -1,4 +1,4 @@
-import todomvc/web
+import todomvc/web/service
 import gleam/io
 import gleam/int
 import gleam/string
@@ -14,7 +14,7 @@ pub fn main() {
     |> result.unwrap(3000)
 
   // Start the web server process
-  assert Ok(_) = elli.start(web.service(), on_port: port)
+  assert Ok(_) = elli.start(service.stack(), on_port: port)
 
   io.println(string.concat([
     "Started listening on localhost:",

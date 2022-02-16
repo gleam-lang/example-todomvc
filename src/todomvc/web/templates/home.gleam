@@ -1,12 +1,16 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
-
 import todomvc/item.{Item}
+import gleam/result
+import gleam/list
 import gleam/int
 
 pub fn render_builder(items items: List(Item)) -> StringBuilder {
-    let builder = string_builder.from_string("")
-    let builder = string_builder.append(builder, "
+  let builder = string_builder.from_string("")
+  let builder =
+    string_builder.append(
+      builder,
+      "
 
 <!DOCTYPE html>
 <html lang=\"en\">
@@ -30,8 +34,7 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
     <hr>
 
     <blockquote class=\"quote speech-bubble\">
-      <!-- TODO: Information on Gleam -->
-      <p>Something here about the type of language gleam is</p>
+      <p>Gleam is a friendly language for building type-safe, scalable systems! ✨</p>
       <footer><a href=\"https://gleam.run\">Gleam</a></footer>
     </blockquote>
     <hr>
@@ -41,9 +44,13 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
       <li><a href=\"https://gleam.run\">Gleam Homepage</a></li>
       <li><a href=\"https://github.com/gleam-lang\">Gleam on GitHub</a></li>
     </ul>
-    <hr>
 
+    <h4>Community</h4>
+    <ul>
+      <li><a href=\"https://discord.gg/Fm8Pwmy\">Gleam Discord Server</a></li>
+    </ul>
   </aside>
+
   <div class=\"todomvc-wrapper\">
     <section class=\"todoapp\">
       <header class=\"header\">
@@ -51,47 +58,99 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
         <!-- TODO: creation -->
         <form method=\"post\" action=\"/create\"><input autofocus=\"\" class=\"new-todo\" placeholder=\"What needs to be complete?\" name=\"newTodo\" autocomplete=\"off\"></form>
       </header>
+
       <section class=\"main\">
+        ",
+    )
+  let builder = case result.is_ok(list.first(items)) {
+    True -> {
+      let builder =
+        string_builder.append(
+          builder,
+          "
         <ul class=\"todo-list\">
-          ")
-    let builder = list.fold(items, builder, fn(builder, item: Item) {
+          ",
+        )
+      let builder =
+        list.fold(
+          items,
+          builder,
+          fn(builder, item: Item) {
             let builder = string_builder.append(builder, "
-          <li class=\"completed\">
+          <li ")
+            let builder = case item.completed {
+              True -> {
+                let builder =
+                  string_builder.append(builder, "class=\"completed\"")
+                builder
+              }
+              False -> builder
+            }
+            let builder =
+              string_builder.append(
+                builder,
+                ">
             <div class=\"view\">
               <!-- TODO: edit -->
-              <input class=\"toggle\" type=\"checkbox\" ")
-    let builder = case item.completed {
-        True -> {
+              <input class=\"toggle\" type=\"checkbox\" ",
+              )
+            let builder = case item.completed {
+              True -> {
                 let builder = string_builder.append(builder, "checked")
-
-            builder
-        }
-        False -> {
-            
-            builder
-        }
-}
-    let builder = string_builder.append(builder, "><label>
-                The text goes here
-              </label><a href=\"/edit/")
-    let builder = string_builder.append(builder, int.to_string(item.id))
-    let builder = string_builder.append(builder, "\" class=\"edit-btn\">✎</a>
+                builder
+              }
+              False -> builder
+            }
+            let builder =
+              string_builder.append(builder, "><label>
+                ")
+            let builder = string_builder.append(builder, item.content)
+            let builder =
+              string_builder.append(
+                builder,
+                "
+              </label><a href=\"/edit/",
+              )
+            let builder = string_builder.append(builder, int.to_string(item.id))
+            let builder =
+              string_builder.append(
+                builder,
+                "\" class=\"edit-btn\">✎</a>
               <!-- TODO: delete -->
-              <form method=\"post\" action=\"/delete/")
-    let builder = string_builder.append(builder, int.to_string(item.id))
-    let builder = string_builder.append(builder, "\"><button class=\"destroy\"></button></form>
+              <form method=\"post\" action=\"/delete/",
+              )
+            let builder = string_builder.append(builder, int.to_string(item.id))
+            let builder =
+              string_builder.append(
+                builder,
+                "\"><button class=\"destroy\"></button></form>
               <!-- TODO: toggle completion -->
-              <form class=\"todo-mark\" method=\"post\" action=\"/mark/active/")
-    let builder = string_builder.append(builder, int.to_string(item.id))
-    let builder = string_builder.append(builder, "\"><button></button></form>
+              <form class=\"todo-mark\" method=\"post\" action=\"/mark/active/",
+              )
+            let builder = string_builder.append(builder, int.to_string(item.id))
+            let builder =
+              string_builder.append(
+                builder,
+                "\"><button></button></form>
             </div>
-          ")
-
-        builder
-})
-    let builder = string_builder.append(builder, "
+          ",
+              )
+            builder
+          },
+        )
+      let builder = string_builder.append(builder, "
         </ul>
+        ")
+      builder
+    }
+    False -> builder
+  }
+  let builder =
+    string_builder.append(
+      builder,
+      "
       </section>
+
       <!-- TODO: filters -->
       <footer class=\"footer\">
         <!-- TODO: count -->
@@ -107,20 +166,23 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
         <form action=\"/clear-completed\" method=\"post\"><button class=\"clear-completed\">Clear Completed (1)</button></form>
       </footer>
     </section>
+
     <footer class=\"info\">
       <p>
-        Inspired by <a href=\"https://gitlab.com/greggreg/gleam_todo\">GregGreg</a> and
-        <a href=\"https://todomvc.com/\">TodoMVC</a>
+        Inspired by <a href=\"https://todomvc.com/\">TodoMVC</a> and
+        <a href=\"https://gitlab.com/greggreg/gleam_todo\">GregGreg's original
+        Gleam implementation</a>
       </p>
     </footer>
   </div>
 </body>
 </html>
-")
+",
+    )
 
-    builder
+  builder
 }
 
 pub fn render(items items: List(Item)) -> String {
-    string_builder.to_string(render_builder(items: items))
+  string_builder.to_string(render_builder(items: items))
 }

@@ -1,6 +1,8 @@
 {> with items as List(Item)
 
 {> import todomvc/item.{Item}
+{> import gleam/result
+{> import gleam/list
 {> import gleam/int
 
 <!DOCTYPE html>
@@ -25,7 +27,6 @@
     <hr>
 
     <blockquote class="quote speech-bubble">
-      <!-- TODO: Information on Gleam -->
       <p>Gleam is a friendly language for building type-safe, scalable systems! ✨</p>
       <footer><a href="https://gleam.run">Gleam</a></footer>
     </blockquote>
@@ -36,7 +37,11 @@
       <li><a href="https://gleam.run">Gleam Homepage</a></li>
       <li><a href="https://github.com/gleam-lang">Gleam on GitHub</a></li>
     </ul>
-    <hr>
+
+    <h4>Community</h4>
+    <ul>
+      <li><a href="https://discord.gg/Fm8Pwmy">Gleam Discord Server</a></li>
+    </ul>
   </aside>
 
   <div class="todomvc-wrapper">
@@ -48,14 +53,14 @@
       </header>
 
       <section class="main">
-        {% if items != [] %}
+        {% if result.is_ok(list.first(items)) %}
         <ul class="todo-list">
           {% for item as Item in items %}
-          <li class="completed">
+          <li {% if item.completed %}class="completed"{% endif %}>
             <div class="view">
               <!-- TODO: edit -->
               <input class="toggle" type="checkbox" {% if item.completed %}checked{% endif %}><label>
-                The text goes here
+                {{ item.content }}
               </label><a href="/edit/{{ int.to_string(item.id) }}" class="edit-btn">✎</a>
               <!-- TODO: delete -->
               <form method="post" action="/delete/{{ int.to_string(item.id) }}"><button class="destroy"></button></form>
@@ -85,8 +90,9 @@
 
     <footer class="info">
       <p>
-        Inspired by <a href="https://gitlab.com/greggreg/gleam_todo">GregGreg</a> and
-        <a href="https://todomvc.com/">TodoMVC</a>
+        Inspired by <a href="https://todomvc.com/">TodoMVC</a> and
+        <a href="https://gitlab.com/greggreg/gleam_todo">GregGreg's original
+        Gleam implementation</a>
       </p>
     </footer>
   </div>
