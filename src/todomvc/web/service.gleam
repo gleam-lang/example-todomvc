@@ -6,6 +6,7 @@ import gleam/http
 import gleam/function
 import todomvc/web/templates/home as home_template
 import todomvc/web/templates/item_created as item_created_template
+import todomvc/web/templates/item_deleted as item_deleted_template
 import todomvc/item.{Item}
 import todomvc/web
 import todomvc/web/static
@@ -81,11 +82,25 @@ fn create_todo(request: Request(BitString)) -> web.Result {
   |> Ok
 }
 
-fn todo_item(request: Request(BitString), _id: String) -> web.Result {
+fn todo_item(request: Request(BitString), id: String) -> web.Result {
   case request.method {
     http.Get -> todo
-    http.Delete -> todo
+    http.Delete -> delete_item(request, id)
     http.Put -> todo
     _ -> Error(web.MethodNotAllowed)
   }
+}
+
+fn delete_item(request: Request(BitString), _id: String) -> web.Result {
+  // TODO: delete item
+  item_deleted_template.render_builder(
+    // TODO: count
+    completed_count: 4,
+    // TODO: count
+    remaining_count: 9,
+    // TODO: count
+    can_clear_completed: True,
+  )
+  |> web.html_response(200)
+  |> Ok
 }

@@ -4,14 +4,27 @@
 {> import todomvc/web
 {> import gleam/int
 
-<li {% if item.completed %}class="completed"{% endif %}>
+<li 
+  id="item-{{ int.to_string(item.id) }}"
+  {% if item.completed %}class="completed"{% endif %}
+>
   <div class="view">
     <!-- TODO: edit -->
-    <input class="toggle" type="checkbox" {% if item.completed %}checked{% endif %}><label>
+    <input class="toggle" type="checkbox" {% if item.completed %}checked{% endif %}>
+
+    <label>
       {{ web.escape(item.content) }}
-    </label><a href="/todos/{{ int.to_string(item.id) }}" class="edit-btn">✎</a>
+    </label>
+
+    <a href="/todos/{{ int.to_string(item.id) }}" class="edit-btn">✎</a>
+
     <!-- TODO: delete -->
-    <form method="post" action="/todos/{{ int.to_string(item.id) }}"><button class="destroy"></button></form>
+    <button
+      class="destroy"
+      hx-delete="/todos/{{ int.to_string(item.id) }}"
+      hx-target="#item-{{ int.to_string(item.id) }}"
+    ></button>
+    </form>
 
     <!-- TODO: toggle completion -->
     <form class="todo-mark" method="post" action="/todo/{{ int.to_string(item.id) }}">

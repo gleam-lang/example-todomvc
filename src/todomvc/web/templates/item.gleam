@@ -8,7 +8,11 @@ pub fn render_builder(item item: Item) -> StringBuilder {
   let builder = string_builder.from_string("")
   let builder = string_builder.append(builder, "
 
-<li ")
+<li 
+  id=\"item-")
+  let builder = string_builder.append(builder, int.to_string(item.id))
+  let builder = string_builder.append(builder, "\"
+  ")
   let builder = case item.completed {
     True -> {
       let builder = string_builder.append(builder, "class=\"completed\"")
@@ -19,7 +23,8 @@ pub fn render_builder(item item: Item) -> StringBuilder {
   let builder =
     string_builder.append(
       builder,
-      ">
+      "
+>
   <div class=\"view\">
     <!-- TODO: edit -->
     <input class=\"toggle\" type=\"checkbox\" ",
@@ -31,24 +36,37 @@ pub fn render_builder(item item: Item) -> StringBuilder {
     }
     False -> builder
   }
-  let builder = string_builder.append(builder, "><label>
+  let builder = string_builder.append(builder, ">
+
+    <label>
       ")
   let builder = string_builder.append(builder, web.escape(item.content))
-  let builder = string_builder.append(builder, "
-    </label><a href=\"/todos/")
+  let builder =
+    string_builder.append(builder, "
+    </label>
+
+    <a href=\"/todos/")
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(
       builder,
       "\" class=\"edit-btn\">✎</a>
+
     <!-- TODO: delete -->
-    <form method=\"post\" action=\"/todos/",
+    <button
+      class=\"destroy\"
+      hx-delete=\"/todos/",
     )
+  let builder = string_builder.append(builder, int.to_string(item.id))
+  let builder = string_builder.append(builder, "\"
+      hx-target=\"#item-")
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(
       builder,
-      "\"><button class=\"destroy\"></button></form>
+      "\"
+    ></button>
+    </form>
 
     <!-- TODO: toggle completion -->
     <form class=\"todo-mark\" method=\"post\" action=\"/todo/",

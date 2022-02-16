@@ -56,7 +56,6 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
     <section class=\"todoapp\">
       <header class=\"header\">
         <h1>todos</h1>
-        <!-- TODO: creation -->
         <form hx-post=\"/todos\">
           <input
             autofocus

@@ -1,0 +1,15 @@
+{> with completed_count as Int
+{> with remaining_count as Int
+{> with can_clear_completed as Bool
+
+{> import gleam/int
+
+<div hx-swap-oob="innerHTML" id="clear-completed">
+  {% if can_clear_completed %}
+  Clear Completed ({{ int.to_string(completed_count) }})
+  {% endif %}
+</div>
+
+<span hx-swap-oob="innerHTML" id="todo-count">
+  <strong>{{ int.to_string(remaining_count) }}</strong> todos left
+</span>
