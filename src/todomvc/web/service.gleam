@@ -53,14 +53,14 @@ fn completed(request: Request(BitString)) -> web.Result {
   case request.method {
     http.Get -> home(Completed)
     http.Delete -> todo
-    _ -> todo
+    _ -> Error(web.MethodNotAllowed)
   }
 }
 
 fn todos(request: Request(BitString)) -> web.Result {
   case request.method {
     http.Post -> todo
-    _ -> todo
+    _ -> Error(web.MethodNotAllowed)
   }
 }
 
@@ -69,6 +69,6 @@ fn todo_item(request: Request(BitString), _id: String) -> web.Result {
     http.Get -> todo
     http.Delete -> todo
     http.Put -> todo
-    _ -> todo
+    _ -> Error(web.MethodNotAllowed)
   }
 }

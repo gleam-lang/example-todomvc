@@ -4,6 +4,7 @@ import gleam/string
 
 pub type Error {
   NotFound
+  MethodNotAllowed
 }
 
 pub type Result =
@@ -19,6 +20,7 @@ pub fn result_to_response(result: Result) -> Response(StringBuilder) {
 pub fn error_to_response(error: Error) -> Response(StringBuilder) {
   case error {
     NotFound -> not_found()
+    MethodNotAllowed -> not_found()
   }
 }
 
@@ -40,5 +42,10 @@ pub fn escape(text: String) -> String {
 
 pub fn not_found() -> Response(StringBuilder) {
   response.new(404)
+  |> response.set_body(string_builder.from_string("There's nothing here..."))
+}
+
+pub fn method_not_allowed() -> Response(StringBuilder) {
+  response.new(405)
   |> response.set_body(string_builder.from_string("There's nothing here..."))
 }
