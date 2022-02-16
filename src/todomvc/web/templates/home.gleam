@@ -1,10 +1,9 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
+import todomvc/web/templates/item as item_template
 import todomvc/item.{Item}
-import todomvc/web
 import gleam/result
 import gleam/list
-import gleam/int
 
 pub fn render_builder(items items: List(Item)) -> StringBuilder {
   let builder = string_builder.from_string("")
@@ -20,6 +19,7 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
   <link rel=\"shortcut icon\" href=\"/assets/favicon.ico\" type=\"image/x-icon\">
   <link rel=\"icon\" href=\"/assets/favicon.ico\" type=\"image/x-icon\">
   <link rel=\"stylesheet\" href=\"/assets/main.css\">
+  <script src=\"/vendor/htmx.min.js\"></script>
   <title>TodoMVC in Gleam</title>
 </head>
 <body class=\"learn-bar\">
@@ -57,115 +57,64 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
       <header class=\"header\">
         <h1>todos</h1>
         <!-- TODO: creation -->
-        <form method=\"post\" action=\"/create\"><input autofocus=\"\" class=\"new-todo\" placeholder=\"What needs to be complete?\" name=\"newTodo\" autocomplete=\"off\"></form>
+        <form hx-post=\"/todos\">
+          <input
+            autofocus
+            required
+            class=\"new-todo\"
+            placeholder=\"What needs to be complete?\"
+            name=\"content\"
+            autocomplete=\"off\"
+          >
+        </form>
       </header>
 
       <section class=\"main\">
-        ",
+        <ul id=\"todo-list\" class=\"todo-list\">
+          ",
     )
-  let builder = case result.is_ok(list.first(items)) {
-    True -> {
-      let builder =
-        string_builder.append(
-          builder,
-          "
-        <ul class=\"todo-list\">
-          ",
-        )
-      let builder =
-        list.fold(
-          items,
-          builder,
-          fn(builder, item: Item) {
-            let builder = string_builder.append(builder, "
-          <li ")
-            let builder = case item.completed {
-              True -> {
-                let builder =
-                  string_builder.append(builder, "class=\"completed\"")
-                builder
-              }
-              False -> builder
-            }
-            let builder =
-              string_builder.append(
-                builder,
-                ">
-            <div class=\"view\">
-              <!-- TODO: edit -->
-              <input class=\"toggle\" type=\"checkbox\" ",
-              )
-            let builder = case item.completed {
-              True -> {
-                let builder = string_builder.append(builder, "checked")
-                builder
-              }
-              False -> builder
-            }
-            let builder =
-              string_builder.append(builder, "><label>
-                ")
-            let builder =
-              string_builder.append(builder, web.escape(item.content))
-            let builder =
-              string_builder.append(
-                builder,
-                "
-              </label><a href=\"/edit/",
-              )
-            let builder = string_builder.append(builder, int.to_string(item.id))
-            let builder =
-              string_builder.append(
-                builder,
-                "\" class=\"edit-btn\">✎</a>
-              <!-- TODO: delete -->
-              <form method=\"post\" action=\"/delete/",
-              )
-            let builder = string_builder.append(builder, int.to_string(item.id))
-            let builder =
-              string_builder.append(
-                builder,
-                "\"><button class=\"destroy\"></button></form>
-              <!-- TODO: toggle completion -->
-              <form class=\"todo-mark\" method=\"post\" action=\"/mark/active/",
-              )
-            let builder = string_builder.append(builder, int.to_string(item.id))
-            let builder =
-              string_builder.append(
-                builder,
-                "\"><button></button></form>
-            </div>
-          ",
-              )
-            builder
-          },
-        )
-      let builder = string_builder.append(builder, "
-        </ul>
-        ")
-      builder
-    }
-    False -> builder
-  }
+  let builder =
+    list.fold(
+      items,
+      builder,
+      fn(builder, item: Item) {
+        let builder = string_builder.append(builder, "
+          ")
+        let builder =
+          string_builder.append_builder(
+            builder,
+            item_template.render_builder(item),
+          )
+        let builder = string_builder.append(builder, "
+          ")
+
+        builder
+      },
+    )
   let builder =
     string_builder.append(
       builder,
       "
+        </ul>
       </section>
 
       <!-- TODO: filters -->
       <footer class=\"footer\">
         <!-- TODO: count -->
-        <span class=\"todo-count\"><strong>0</strong> todos left</span>
+        <span id=\"todo-count\" class=\"todo-count\">
+          <strong>0</strong> todos left
+        </span>
         <ul class=\"filters\">
           <!-- TODO: highlight selected -->
+          <!-- TODO: set selected depending on which page we're on -->
           <li><a class=\"\" href=\"/\">All</a></li>
           <li><a class=\"\" href=\"/active\">Active</a></li>
-          <li><a class=\"selected\" href=\"/complete\">Completed</a></li>
+          <li><a class=\"selected\" href=\"/completed\">Completed</a></li>
         </ul>
+
         <!-- TODO: clear -->
         <!-- TODO: counter -->
-        <form action=\"/clear-completed\" method=\"post\"><button class=\"clear-completed\">Clear Completed (1)</button></form>
+        <button id=\"clear-completed\" class=\"clear-completed\">Clear Completed (1)</button>
       </footer>
     </section>
 

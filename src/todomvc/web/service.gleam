@@ -5,6 +5,7 @@ import gleam/http/response
 import gleam/http
 import gleam/function
 import todomvc/web/templates/home as home_template
+import todomvc/web/templates/item_created as item_created_template
 import todomvc/item.{Item}
 import todomvc/web
 import todomvc/web/static
@@ -59,9 +60,25 @@ fn completed(request: Request(BitString)) -> web.Result {
 
 fn todos(request: Request(BitString)) -> web.Result {
   case request.method {
-    http.Post -> todo
+    http.Post -> create_todo(request)
     _ -> Error(web.MethodNotAllowed)
   }
+}
+
+fn create_todo(request: Request(BitString)) -> web.Result {
+  // TODO: create item
+  let item = Item(id: 5, completed: False, content: "wibble")
+  item_created_template.render_builder(
+    item: item,
+    // TODO: count
+    completed_count: 5,
+    // TODO: count
+    remaining_count: 10,
+    // TODO: count
+    can_clear_completed: True,
+  )
+  |> web.html_response(201)
+  |> Ok
 }
 
 fn todo_item(request: Request(BitString), _id: String) -> web.Result {

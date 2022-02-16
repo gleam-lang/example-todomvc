@@ -1,10 +1,9 @@
 {> with items as List(Item)
 
+{> import todomvc/web/templates/item as item_template
 {> import todomvc/item.{Item}
-{> import todomvc/web
 {> import gleam/result
 {> import gleam/list
-{> import gleam/int
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,6 +12,7 @@
   <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
   <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="/assets/main.css">
+  <script src="/vendor/htmx.min.js"></script>
   <title>TodoMVC in Gleam</title>
 </head>
 <body class="learn-bar">
@@ -50,36 +50,32 @@
       <header class="header">
         <h1>todos</h1>
         <!-- TODO: creation -->
-        <form method="post" action="/todos"><input autofocus="" class="new-todo" placeholder="What needs to be complete?" name="newTodo" autocomplete="off"></form>
+        <form hx-post="/todos">
+          <input
+            autofocus
+            required
+            class="new-todo"
+            placeholder="What needs to be complete?"
+            name="content"
+            autocomplete="off"
+          >
+        </form>
       </header>
 
       <section class="main">
-        {% if result.is_ok(list.first(items)) %}
-        <ul class="todo-list">
+        <ul id="todo-list" class="todo-list">
           {% for item as Item in items %}
-          <li {% if item.completed %}class="completed"{% endif %}>
-            <div class="view">
-              <!-- TODO: edit -->
-              <input class="toggle" type="checkbox" {% if item.completed %}checked{% endif %}><label>
-                {{ web.escape(item.content) }}
-              </label><a href="/todos/{{ int.to_string(item.id) }}" class="edit-btn">✎</a>
-              <!-- TODO: delete -->
-              <form method="post" action="/todos/{{ int.to_string(item.id) }}"><button class="destroy"></button></form>
-
-              <!-- TODO: toggle completion -->
-              <form class="todo-mark" method="post" action="/todo/{{ int.to_string(item.id) }}">
-                <button></button>
-              </form>
-            </div>
+          {[ item_template.render_builder(item) ]}
           {% endfor %}
         </ul>
-        {% endif %}
       </section>
 
       <!-- TODO: filters -->
       <footer class="footer">
         <!-- TODO: count -->
-        <span class="todo-count"><strong>0</strong> todos left</span>
+        <span id="todo-count" class="todo-count">
+          <strong>0</strong> todos left
+        </span>
         <ul class="filters">
           <!-- TODO: highlight selected -->
           <!-- TODO: set selected depending on which page we're on -->
@@ -90,9 +86,7 @@
 
         <!-- TODO: clear -->
         <!-- TODO: counter -->
-        <form action="/complete" method="post">
-          <button class="clear-completed">Clear Completed (1)</button>
-        </form>
+        <button id="clear-completed" class="clear-completed">Clear Completed (1)</button>
       </footer>
     </section>
 
