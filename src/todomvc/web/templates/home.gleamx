@@ -85,12 +85,12 @@
           <!-- TODO: set selected depending on which page we're on -->
           <li><a class="" href="/">All</a></li>
           <li><a class="" href="/active">Active</a></li>
-          <li><a class="selected" href="/complete">Completed</a></li>
+          <li><a class="selected" href="/completed">Completed</a></li>
         </ul>
 
         <!-- TODO: clear -->
         <!-- TODO: counter -->
-        <form action="/completed" method="post">
+        <form action="/complete" method="post">
           <button class="clear-completed">Clear Completed (1)</button>
         </form>
       </footer>

@@ -18,9 +18,7 @@ pub fn result_to_response(result: Result) -> Response(StringBuilder) {
 
 pub fn error_to_response(error: Error) -> Response(StringBuilder) {
   case error {
-    NotFound ->
-      response.new(404)
-      |> response.set_body(string_builder.from_string("There's nothing here..."))
+    NotFound -> not_found()
   }
 }
 
@@ -38,4 +36,9 @@ pub fn escape(text: String) -> String {
   |> string.replace("&", "&amp;")
   |> string.replace("<", "&lt;")
   |> string.replace(">", "&gt;")
+}
+
+pub fn not_found() -> Response(StringBuilder) {
+  response.new(404)
+  |> response.set_body(string_builder.from_string("There's nothing here..."))
 }

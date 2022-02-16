@@ -2,6 +2,7 @@ import gleam/bit_builder.{BitBuilder}
 import gleam/http/service.{Service}
 import gleam/http/request.{Request}
 import gleam/http/response
+import gleam/http
 import gleam/function
 import todomvc/web/templates/home as home_template
 import todomvc/item.{Item}
@@ -11,7 +12,11 @@ import todomvc/web/logger
 
 pub fn router(request: Request(BitString)) -> web.Result {
   case request.path_segments(request) {
-    [] -> home()
+    [] -> home(All)
+    ["active"] -> home(Active)
+    ["completed"] -> completed(request)
+    ["todos"] -> todos(request)
+    ["todos", id] -> todo_item(request, id)
     _ -> Error(web.NotFound)
   }
 }
@@ -25,7 +30,13 @@ pub fn stack() -> Service(BitString, BitBuilder) {
   |> static.middleware()
 }
 
-fn home() -> web.Result {
+pub type ItemsCategory {
+  All
+  Active
+  Completed
+}
+
+fn home(_category: ItemsCategory) -> web.Result {
   let items = [
     Item(id: 1, completed: True, content: "Create Gleam"),
     Item(id: 2, completed: False, content: "Write TodoMVC in Gleam"),
@@ -36,4 +47,28 @@ fn home() -> web.Result {
   home_template.render_builder(items)
   |> web.html_response(200)
   |> Ok
+}
+
+fn completed(request: Request(BitString)) -> web.Result {
+  case request.method {
+    http.Get -> home(Completed)
+    http.Delete -> todo
+    _ -> todo
+  }
+}
+
+fn todos(request: Request(BitString)) -> web.Result {
+  case request.method {
+    http.Post -> todo
+    _ -> todo
+  }
+}
+
+fn todo_item(request: Request(BitString), _id: String) -> web.Result {
+  case request.method {
+    http.Get -> todo
+    http.Delete -> todo
+    http.Put -> todo
+    _ -> todo
+  }
 }
