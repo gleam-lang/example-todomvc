@@ -1,6 +1,7 @@
 {> with items as List(Item)
 
 {> import todomvc/item.{Item}
+{> import todomvc/web
 {> import gleam/result
 {> import gleam/list
 {> import gleam/int
@@ -60,7 +61,7 @@
             <div class="view">
               <!-- TODO: edit -->
               <input class="toggle" type="checkbox" {% if item.completed %}checked{% endif %}><label>
-                {{ item.content }}
+                {{ web.escape(item.content) }}
               </label><a href="/edit/{{ int.to_string(item.id) }}" class="edit-btn">✎</a>
               <!-- TODO: delete -->
               <form method="post" action="/delete/{{ int.to_string(item.id) }}"><button class="destroy"></button></form>

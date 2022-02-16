@@ -27,6 +27,7 @@ fn home() {
     Item(id: 1, completed: True, content: "Create Gleam"),
     Item(id: 2, completed: False, content: "Write TodoMVC in Gleam"),
     Item(id: 3, completed: False, content: "Deploy TodoMVC"),
+    Item(id: 4, completed: False, content: "<script>alert(1)</script>"),
   ]
   let html = home_template.render_builder(items)
 

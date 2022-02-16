@@ -1,6 +1,7 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
 import todomvc/item.{Item}
+import todomvc/web
 import gleam/result
 import gleam/list
 import gleam/int
@@ -104,7 +105,8 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
             let builder =
               string_builder.append(builder, "><label>
                 ")
-            let builder = string_builder.append(builder, item.content)
+            let builder =
+              string_builder.append(builder, web.escape(item.content))
             let builder =
               string_builder.append(
                 builder,
