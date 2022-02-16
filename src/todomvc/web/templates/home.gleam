@@ -1,13 +1,13 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
+
 import todomvc/item.{Item}
+import gleam/int
 
 pub fn render_builder(items items: List(Item)) -> StringBuilder {
-  let builder = string_builder.from_string("")
-  let builder =
-    string_builder.append(
-      builder,
-      "
+    let builder = string_builder.from_string("")
+    let builder = string_builder.append(builder, "
+
 <!DOCTYPE html>
 <html lang=\"en\">
 <head>
@@ -53,38 +53,43 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
       </header>
       <section class=\"main\">
         <ul class=\"todo-list\">
-          ",
-    )
-  let builder =
-    list.fold(
-      items,
-      builder,
-      fn(builder, item) {
-        let builder =
-          string_builder.append(
-            builder,
-            "
+          ")
+    let builder = list.fold(items, builder, fn(builder, item: Item) {
+            let builder = string_builder.append(builder, "
           <li class=\"completed\">
             <div class=\"view\">
               <!-- TODO: edit -->
-              <input class=\"toggle\" type=\"checkbox\" checked=\"\"><label>
+              <input class=\"toggle\" type=\"checkbox\" ")
+    let builder = case item.completed {
+        True -> {
+                let builder = string_builder.append(builder, "checked")
+
+            builder
+        }
+        False -> {
+            
+            builder
+        }
+}
+    let builder = string_builder.append(builder, "><label>
                 The text goes here
-              </label><a href=\"/edit/08680FDA-9B22-4ADE-8E9B-23F54178A89E\" class=\"edit-btn\">✎</a>
+              </label><a href=\"/edit/")
+    let builder = string_builder.append(builder, int.to_string(item.id))
+    let builder = string_builder.append(builder, "\" class=\"edit-btn\">✎</a>
               <!-- TODO: delete -->
-              <form method=\"post\" action=\"/delete/08680FDA-9B22-4ADE-8E9B-23F54178A89E\"><button class=\"destroy\"></button></form>
+              <form method=\"post\" action=\"/delete/")
+    let builder = string_builder.append(builder, int.to_string(item.id))
+    let builder = string_builder.append(builder, "\"><button class=\"destroy\"></button></form>
               <!-- TODO: toggle completion -->
-              <form class=\"todo-mark\" method=\"post\" action=\"/mark/active/08680FDA-9B22-4ADE-8E9B-23F54178A89E\"><button></button></form>
+              <form class=\"todo-mark\" method=\"post\" action=\"/mark/active/")
+    let builder = string_builder.append(builder, int.to_string(item.id))
+    let builder = string_builder.append(builder, "\"><button></button></form>
             </div>
-          ",
-          )
+          ")
 
         builder
-      },
-    )
-  let builder =
-    string_builder.append(
-      builder,
-      "
+})
+    let builder = string_builder.append(builder, "
         </ul>
       </section>
       <!-- TODO: filters -->
@@ -111,12 +116,11 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
   </div>
 </body>
 </html>
-",
-    )
+")
 
-  builder
+    builder
 }
 
 pub fn render(items items: List(Item)) -> String {
-  string_builder.to_string(render_builder(items: items))
+    string_builder.to_string(render_builder(items: items))
 }
