@@ -60,6 +60,8 @@ from
   items
 where
   user_id = $1
+order by
+  inserted_at asc
 "
 
   assert Ok(result) =
