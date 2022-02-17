@@ -6,6 +6,9 @@ import gleam/result
 import gleam/erlang
 import gleam/erlang/os
 import gleam/http/elli
+import gleam/dynamic
+import gleam/pgo
+import gleam/io
 
 pub fn main() {
   let port =
@@ -24,4 +27,15 @@ pub fn main() {
 
   // Put the main process to sleep while the web server does its thing
   erlang.sleep_forever()
+}
+
+pub fn start_database_connection_pool() -> pgo.Connection {
+  pgo.connect(
+    pgo.Config(
+      ..pgo.default_config(),
+      host: "localhost",
+      database: "gleam_todomvc_dev",
+      pool_size: 15,
+    ),
+  )
 }
