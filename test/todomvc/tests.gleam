@@ -13,7 +13,20 @@ pub fn with_db(f: fn(pgo.Connection) -> a) -> a {
       pool_size: 1,
     )
   let db = pgo.connect(config)
-  let result = f(db)
-  pgo.disconnect(db)
-  result
+
+  ensure(run: fn() { f(db) }, afterwards: fn() { pgo.disconnect(db) })
 }
+
+pub fn truncate_db(db: pgo.Connection) -> Nil {
+  let sql = "
+truncate
+  users,
+  items
+cascade
+"
+  assert Ok(_) = pgo.execute(sql, on: db, with: [], expecting: Ok)
+  Nil
+}
+
+pub external fn ensure(run: fn() -> a, afterwards: fn() -> b) -> a =
+  "todomvc_test_helper" "ensure"
