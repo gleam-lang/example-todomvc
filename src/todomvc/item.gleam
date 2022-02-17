@@ -1,3 +1,6 @@
+import gleam/pgo
+import gleam/dynamic
+
 pub type Item {
   Item(id: Int, completed: Bool, content: String)
 }
@@ -53,8 +56,13 @@ and
   todo
 }
 
-pub fn toggle_completion() -> Nil {
-  "
+pub fn toggle_completion(
+  item_id: Int,
+  user_id: Int,
+  db: pgo.Connection,
+) -> Result(Bool, Nil) {
+  let sql =
+    "
 update
   items
 set
@@ -66,5 +74,16 @@ and
 returning
   completed
 "
-  todo
+  assert Ok(result) =
+    pgo.execute(
+      sql,
+      on: db,
+      with: [pgo.int(item_id), pgo.int(user_id)],
+      expecting: dynamic.element(0, dynamic.bool),
+    )
+
+  case result.rows {
+    [completed] -> Ok(completed)
+    _ -> Error(Nil)
+  }
 }

@@ -4,6 +4,7 @@ import gleam/http/request.{Request}
 import gleam/http/response
 import gleam/http
 import gleam/function
+import gleam/pgo
 import todomvc/templates/home as home_template
 import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_deleted as item_deleted_template
@@ -12,7 +13,7 @@ import todomvc/web
 import todomvc/web/static
 import todomvc/web/print_requests
 
-pub fn router(request: Request(BitString)) -> web.Result {
+pub fn router(request: Request(BitString), db: pgo.Connection) -> web.Result {
   case request.path_segments(request) {
     [] -> home(All)
     ["active"] -> home(Active)
@@ -23,8 +24,8 @@ pub fn router(request: Request(BitString)) -> web.Result {
   }
 }
 
-pub fn stack() -> Service(BitString, BitBuilder) {
-  router
+pub fn stack(db: pgo.Connection) -> Service(BitString, BitBuilder) {
+  router(_, db)
   |> function.compose(web.result_to_response)
   |> service.prepend_response_header("made-with", "Gleam")
   |> service.map_response_body(bit_builder.from_string_builder)

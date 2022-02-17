@@ -16,17 +16,15 @@ pub fn main() {
     |> result.then(int.parse)
     |> result.unwrap(3000)
 
-  // Start the web server process
-  assert Ok(_) = elli.start(service.stack(), on_port: port)
-
   io.println(string.concat([
-    "Started listening on localhost:",
+    "Listening on localhost:",
     int.to_string(port),
     " ✨",
   ]))
 
-  // Put the main process to sleep while the web server does its thing
-  erlang.sleep_forever()
+  let db = start_database_connection_pool()
+  let web = service.stack(db)
+  assert Ok(_) = elli.become(web, on_port: port)
 }
 
 pub fn start_database_connection_pool() -> pgo.Connection {
