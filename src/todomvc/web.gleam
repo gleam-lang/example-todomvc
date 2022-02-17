@@ -1,14 +1,10 @@
 import gleam/http/response.{Response}
 import gleam/string_builder.{StringBuilder}
 import gleam/string
-
-pub type Error {
-  NotFound
-  MethodNotAllowed
-}
+import todomvc/error.{AppError}
 
 pub type Result =
-  Result(Response(StringBuilder), Error)
+  Result(Response(StringBuilder), AppError)
 
 pub fn result_to_response(result: Result) -> Response(StringBuilder) {
   case result {
@@ -17,10 +13,9 @@ pub fn result_to_response(result: Result) -> Response(StringBuilder) {
   }
 }
 
-pub fn error_to_response(error: Error) -> Response(StringBuilder) {
+pub fn error_to_response(error: AppError) -> Response(StringBuilder) {
   case error {
-    NotFound -> not_found()
-    MethodNotAllowed -> not_found()
+    error.NotFound | error.MethodNotAllowed | error.UserNotFound -> not_found()
   }
 }
 

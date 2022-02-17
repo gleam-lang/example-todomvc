@@ -1,7 +1,7 @@
 import gleam/pgo
 import gleam/dynamic
 
-pub fn create_user(db: pgo.Connection) -> Int {
+pub fn insert_user(db: pgo.Connection) -> Int {
   let sql = "
 insert into users 
 default values

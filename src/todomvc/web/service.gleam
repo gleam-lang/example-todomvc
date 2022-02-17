@@ -9,6 +9,7 @@ import todomvc/templates/home as home_template
 import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_deleted as item_deleted_template
 import todomvc/item.{Item}
+import todomvc/error
 import todomvc/web
 import todomvc/web/static
 import todomvc/web/print_requests
@@ -20,7 +21,7 @@ pub fn router(request: Request(BitString), db: pgo.Connection) -> web.Result {
     ["completed"] -> completed(request)
     ["todos"] -> todos(request)
     ["todos", id] -> todo_item(request, id)
-    _ -> Error(web.NotFound)
+    _ -> Error(error.NotFound)
   }
 }
 
@@ -56,14 +57,14 @@ fn completed(request: Request(BitString)) -> web.Result {
   case request.method {
     http.Get -> home(Completed)
     http.Delete -> todo
-    _ -> Error(web.MethodNotAllowed)
+    _ -> Error(error.MethodNotAllowed)
   }
 }
 
 fn todos(request: Request(BitString)) -> web.Result {
   case request.method {
     http.Post -> create_todo(request)
-    _ -> Error(web.MethodNotAllowed)
+    _ -> Error(error.MethodNotAllowed)
   }
 }
 
@@ -88,7 +89,7 @@ fn todo_item(request: Request(BitString), id: String) -> web.Result {
     http.Get -> todo
     http.Delete -> delete_item(request, id)
     http.Put -> todo
-    _ -> Error(web.MethodNotAllowed)
+    _ -> Error(error.MethodNotAllowed)
   }
 }
 

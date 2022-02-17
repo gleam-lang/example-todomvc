@@ -1,5 +1,7 @@
 import gleam/pgo
 import gleam/dynamic
+import gleam/result
+import todomvc/error.{AppError}
 
 pub type Item {
   Item(id: Int, completed: Bool, content: String)
@@ -20,28 +22,60 @@ group by
   todo
 }
 
-pub fn insert_item() -> Nil {
-  "
+pub fn insert_item(
+  content: String,
+  user_id: Int,
+  db: pgo.Connection,
+) -> Result(Int, AppError) {
+  let sql =
+    "
 insert into items
   (content, user_id) 
 values 
   ($1, $2)
+returning
+  id
 "
-  todo
+  try result =
+    pgo.execute(
+      sql,
+      on: db,
+      with: [pgo.text(content), pgo.int(user_id)],
+      expecting: dynamic.element(0, dynamic.int),
+    )
+    |> result.replace_error(error.UserNotFound)
+
+  assert [id] = result.rows
+  Ok(id)
 }
 
-pub fn list_items() -> Nil {
-  "
+pub fn list_items(user_id: Int, db: pgo.Connection) -> List(Item) {
+  let sql =
+    "
 select
   id,
-  user_id,
+  completed,
   content
 from
   items
 where
   user_id = $1
 "
-  todo
+
+  assert Ok(result) =
+    pgo.execute(
+      sql,
+      on: db,
+      with: [pgo.int(user_id)],
+      expecting: dynamic.decode3(
+        Item,
+        dynamic.element(0, dynamic.int),
+        dynamic.element(1, dynamic.bool),
+        dynamic.element(2, dynamic.string),
+      ),
+    )
+
+  result.rows
 }
 
 pub fn delete_item() -> Nil {
