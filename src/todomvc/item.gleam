@@ -1,4 +1,5 @@
 import gleam/pgo
+import gleam/list
 import gleam/dynamic
 import gleam/result
 import todomvc/error.{AppError}
@@ -7,19 +8,41 @@ pub type Item {
   Item(id: Int, completed: Bool, content: String)
 }
 
-pub fn get_counts() -> Nil {
-  "
+pub type Counts {
+  Counts(completed: Int, active: Int)
+}
+
+pub fn get_counts(user_id: Int, db: pgo.Connection) -> Counts {
+  let sql =
+    "
 select 
   completed,
   count(*)
 from
   items
 where
-  item.user_id = $1
+  items.user_id = $1
 group by
   completed
+order by
+  completed asc
 "
-  todo
+  assert Ok(result) =
+    pgo.execute(
+      sql,
+      on: db,
+      with: [pgo.int(user_id)],
+      expecting: dynamic.tuple2(dynamic.bool, dynamic.int),
+    )
+  let completed =
+    result.rows
+    |> list.key_find(True)
+    |> result.unwrap(0)
+  let active =
+    result.rows
+    |> list.key_find(False)
+    |> result.unwrap(0)
+  Counts(active: active, completed: completed)
 }
 
 pub fn insert_item(

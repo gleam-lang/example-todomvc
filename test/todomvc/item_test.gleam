@@ -67,3 +67,31 @@ pub fn toggle_user_mismatch_test() {
     |> should.equal(Error(Nil))
   })
 }
+
+pub fn counts_test() {
+  tests.with_db(fn(db) {
+    let user_id1 = user.insert_user(db)
+    let user_id2 = user.insert_user(db)
+
+    item.get_counts(user_id1, db)
+    |> should.equal(item.Counts(active: 0, completed: 0))
+
+    // Items can be added
+    assert Ok(id1) = item.insert_item("x", user_id1, db)
+    assert Ok(id2) = item.insert_item("x", user_id1, db)
+    assert Ok(id3) = item.insert_item("x", user_id1, db)
+    assert Ok(_id) = item.insert_item("x", user_id1, db)
+    assert Ok(_id) = item.insert_item("x", user_id2, db)
+    assert Ok(_id) = item.insert_item("x", user_id2, db)
+
+    item.get_counts(user_id1, db)
+    |> should.equal(item.Counts(active: 4, completed: 0))
+
+    assert Ok(_) = item.toggle_completion(id1, user_id1, db)
+    assert Ok(_) = item.toggle_completion(id2, user_id1, db)
+    assert Ok(_) = item.toggle_completion(id3, user_id1, db)
+
+    item.get_counts(user_id1, db)
+    |> should.equal(item.Counts(active: 1, completed: 3))
+  })
+}
