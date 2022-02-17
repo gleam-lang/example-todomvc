@@ -6,7 +6,7 @@ import gleam/result
 import gleam/erlang
 import gleam/erlang/os
 import gleam/http/elli
-import gleam/dynamic
+import gleam/option
 import gleam/pgo
 import gleam/io
 
@@ -35,6 +35,8 @@ pub fn start_database_connection_pool() -> pgo.Connection {
       ..pgo.default_config(),
       host: "localhost",
       database: "gleam_todomvc_dev",
+      user: "postgres",
+      password: option.Some("postgres"),
       pool_size: 15,
     ),
   )
