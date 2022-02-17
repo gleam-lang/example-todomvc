@@ -31,3 +31,39 @@ pub fn item_with_unknown_user_test() {
     |> should.equal(Error(error.UserNotFound))
   })
 }
+
+pub fn toggle_test() {
+  tests.with_db(fn(db) {
+    let user_id = user.insert_user(db)
+
+    // Items can be added
+    assert Ok(id1) = item.insert_item("One", user_id, db)
+
+    item.toggle_completion(id1, user_id, db)
+    |> should.equal(Ok(True))
+    item.toggle_completion(id1, user_id, db)
+    |> should.equal(Ok(False))
+  })
+}
+
+pub fn toggle_unknown_id_test() {
+  tests.with_db(fn(db) {
+    let user_id = user.insert_user(db)
+
+    item.toggle_completion(0, user_id, db)
+    |> should.equal(Error(Nil))
+  })
+}
+
+pub fn toggle_user_mismatch_test() {
+  tests.with_db(fn(db) {
+    let user_id1 = user.insert_user(db)
+    let user_id2 = user.insert_user(db)
+
+    // Items can be added
+    assert Ok(id1) = item.insert_item("One", user_id1, db)
+
+    item.toggle_completion(id1, user_id2, db)
+    |> should.equal(Error(Nil))
+  })
+}
