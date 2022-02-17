@@ -103,8 +103,8 @@ order by
   result.rows
 }
 
-pub fn delete_item() -> Nil {
-  "
+pub fn delete_item(item_id: Int, user_id: Int, db: pgo.Connection) -> Bool {
+  let sql = "
 delete from
   items
 where
@@ -112,7 +112,14 @@ where
 and
   user_id = $2
 "
-  todo
+  assert Ok(result) =
+    pgo.execute(
+      sql,
+      on: db,
+      with: [pgo.int(item_id), pgo.int(user_id)],
+      expecting: Ok,
+    )
+  result.count > 0
 }
 
 pub fn toggle_completion(

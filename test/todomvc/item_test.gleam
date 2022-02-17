@@ -76,7 +76,6 @@ pub fn counts_test() {
     item.get_counts(user_id1, db)
     |> should.equal(item.Counts(active: 0, completed: 0))
 
-    // Items can be added
     assert Ok(id1) = item.insert_item("x", user_id1, db)
     assert Ok(id2) = item.insert_item("x", user_id1, db)
     assert Ok(id3) = item.insert_item("x", user_id1, db)
@@ -93,5 +92,35 @@ pub fn counts_test() {
 
     item.get_counts(user_id1, db)
     |> should.equal(item.Counts(active: 1, completed: 3))
+  })
+}
+
+pub fn delete_test() {
+  tests.with_db(fn(db) {
+    let user_id = user.insert_user(db)
+    assert Ok(id) = item.insert_item("x", user_id, db)
+
+    item.delete_item(id, user_id, db)
+    |> should.equal(True)
+
+    item.list_items(user_id, db)
+    |> should.equal([])
+
+    item.delete_item(id, user_id, db)
+    |> should.equal(False)
+  })
+}
+
+pub fn delete_other_users_item_test() {
+  tests.with_db(fn(db) {
+    let user_id1 = user.insert_user(db)
+    let user_id2 = user.insert_user(db)
+    assert Ok(id) = item.insert_item("x", user_id1, db)
+
+    item.delete_item(id, user_id2, db)
+    |> should.equal(False)
+
+    item.list_items(user_id1, db)
+    |> should.equal([Item(id: id, completed: False, content: "x")])
   })
 }
