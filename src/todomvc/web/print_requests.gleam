@@ -6,6 +6,7 @@ import gleam/int
 import gleam/io
 import gleam/string
 import gleam/string_builder
+import todomvc/log
 
 fn format_log_line(
   request: Request(a),
@@ -35,7 +36,7 @@ pub fn middleware(service: Service(a, b)) -> Service(a, b) {
     let before = now()
     let response = service(request)
     let elapsed = convert_time_unit(now() - before, Native, Microsecond)
-    io.println(format_log_line(request, response, elapsed))
+    log.info(format_log_line(request, response, elapsed))
     response
   }
 }

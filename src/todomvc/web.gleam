@@ -60,8 +60,9 @@ pub fn authenticate(
 
     case new_user {
       True ->
-        response
-        |> response.set_cookie("uid", int.to_string(id), cookie.defaults(Http))
+        <<int.to_string(id):utf8>>
+        |> crypto.sign_message(<<secret:utf8>>, crypto.Sha256)
+        |> response.set_cookie(response, "uid", _, cookie.defaults(Http))
         |> Ok
       False -> Ok(response)
     }
@@ -78,7 +79,10 @@ pub fn user_id_from_cookies(
       |> result.then(bit_string.to_string)
       |> result.then(int.parse)
       |> result.map(option.Some)
-      |> result.replace_error(error.BadRequest)
+      |> result.map_error(fn(_) {
+        log.info("Ignoring bad uid cookie")
+        error.BadRequest
+      })
     Error(_) -> Ok(option.None)
   }
 }
