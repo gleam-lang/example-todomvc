@@ -16,6 +16,7 @@ import gleam/pgo
 import gleam/crypto
 import todomvc/error.{AppError}
 import todomvc/user
+import todomvc/log
 
 pub type AppRequest {
   AppRequest(
@@ -41,7 +42,10 @@ pub fn authenticate(
     try id = user_id_from_cookies(request, secret)
 
     let #(id, new_user) = case id {
-      option.None -> #(user.insert_user(db), True)
+      option.None -> {
+        log.info("New user created")
+        #(user.insert_user(db), True)
+      }
       option.Some(id) -> #(id, False)
     }
 
