@@ -1,12 +1,9 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
+import todomvc/item.{Counts}
 import gleam/int
 
-pub fn render_builder(
-  completed_count completed_count: Int,
-  remaining_count remaining_count: Int,
-  can_clear_completed can_clear_completed: Bool,
-) -> StringBuilder {
+pub fn render_builder(counts counts: Counts) -> StringBuilder {
   let builder = string_builder.from_string("")
   let builder =
     string_builder.append(
@@ -16,12 +13,12 @@ pub fn render_builder(
 <div hx-swap-oob=\"innerHTML\" id=\"clear-completed\">
   ",
     )
-  let builder = case can_clear_completed {
+  let builder = case item.any_completed(counts) {
     True -> {
       let builder = string_builder.append(builder, "
   Clear Completed (")
       let builder =
-        string_builder.append(builder, int.to_string(completed_count))
+        string_builder.append(builder, int.to_string(counts.completed))
       let builder = string_builder.append(builder, ")
   ")
       builder
@@ -37,7 +34,7 @@ pub fn render_builder(
 <span hx-swap-oob=\"innerHTML\" id=\"todo-count\">
   <strong>",
     )
-  let builder = string_builder.append(builder, int.to_string(remaining_count))
+  let builder = string_builder.append(builder, int.to_string(counts.active))
   let builder = string_builder.append(builder, "</strong> todos left
 </span>
 ")
@@ -45,14 +42,6 @@ pub fn render_builder(
   builder
 }
 
-pub fn render(
-  completed_count completed_count: Int,
-  remaining_count remaining_count: Int,
-  can_clear_completed can_clear_completed: Bool,
-) -> String {
-  string_builder.to_string(render_builder(
-    completed_count: completed_count,
-    remaining_count: remaining_count,
-    can_clear_completed: can_clear_completed,
-  ))
+pub fn render(counts counts: Counts) -> String {
+  string_builder.to_string(render_builder(counts: counts))
 }

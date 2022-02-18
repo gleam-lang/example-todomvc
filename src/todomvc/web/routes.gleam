@@ -77,9 +77,13 @@ fn home(request: web.AppRequest, category: ItemsCategory) -> web.AppResult {
 fn completed(request: web.AppRequest) -> web.AppResult {
   case request.method {
     http.Get -> home(request, Completed)
-    http.Delete -> todo
+    http.Delete -> delete_completed(request)
     _ -> Error(error.MethodNotAllowed)
   }
+}
+
+fn delete_completed(request: web.AppRequest) -> web.AppResult {
+  todo
 }
 
 fn todos(request: web.AppRequest) -> web.AppResult {
@@ -91,12 +95,8 @@ fn todos(request: web.AppRequest) -> web.AppResult {
 
 fn create_todo(request: web.AppRequest) -> web.AppResult {
   try params = web.parse_urlencoded_body(request)
-  try content =
-    list.key_find(params, "content")
-    |> result.replace_error(error.UnprocessableEntity)
-  try id =
-    item.insert_item(content, request.user_id, request.db)
-    |> result.replace_error(error.UnprocessableEntity)
+  try content = web.key_find(params, "content")
+  try id = item.insert_item(content, request.user_id, request.db)
   log.info("Item created")
 
   item_created_template.render_builder(
@@ -124,16 +124,12 @@ fn update_todo(request: web.AppRequest, _id: String) -> web.AppResult {
   todo
 }
 
-fn delete_item(request: web.AppRequest, _id: String) -> web.AppResult {
-  // TODO: delete item
-  item_deleted_template.render_builder(
-    // TODO: count
-    completed_count: 4,
-    // TODO: count
-    remaining_count: 9,
-    // TODO: count
-    can_clear_completed: True,
-  )
+fn delete_item(request: web.AppRequest, id: String) -> web.AppResult {
+  try id = web.parse_int(id)
+  item.delete_item(id, request.user_id, request.db)
+
+  item.get_counts(request.user_id, request.db)
+  |> item_deleted_template.render_builder
   |> web.html_response(200)
   |> Ok
 }

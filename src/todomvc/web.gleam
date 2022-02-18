@@ -161,3 +161,15 @@ pub fn parse_urlencoded_body(
   uri.parse_query(request.body)
   |> result.replace_error(error.BadRequest)
 }
+
+pub fn key_find(list: List(#(k, v)), key: k) -> Result(v, AppError) {
+  list
+  |> list.key_find(key)
+  |> result.replace_error(error.UnprocessableEntity)
+}
+
+pub fn parse_int(string: String) -> Result(Int, AppError) {
+  string
+  |> int.parse
+  |> result.replace_error(error.BadRequest)
+}
