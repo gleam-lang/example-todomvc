@@ -101,12 +101,7 @@ fn create_todo(request: web.AppRequest) -> web.AppResult {
 
   item_created_template.render_builder(
     item: Item(id: id, completed: False, content: content),
-    // TODO: count
-    completed_count: 5,
-    // TODO: count
-    remaining_count: 10,
-    // TODO: count
-    can_clear_completed: True,
+    counts: item.get_counts(request.user_id, request.db),
   )
   |> web.html_response(201)
   |> Ok

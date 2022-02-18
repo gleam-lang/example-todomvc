@@ -219,3 +219,7 @@ returning
     _ -> Error(Nil)
   }
 }
+
+pub fn any_completed(counts: Counts) -> Bool {
+  counts.completed > 0
+}

@@ -1,10 +1,8 @@
 {> with item as Item
-{> with completed_count as Int
-{> with remaining_count as Int
-{> with can_clear_completed as Bool
+{> with counts as Counts
 
 {> import todomvc/templates/item as item_template
-{> import todomvc/item.{Item}
+{> import todomvc/item.{Item, Counts}
 {> import gleam/int
 
 <input
@@ -21,11 +19,11 @@
 </div>
 
 <div hx-swap-oob="innerHTML" id="clear-completed">
-  {% if can_clear_completed %}
-  Clear Completed ({{ int.to_string(completed_count) }})
+  {% if item.any_completed(counts) %}
+  Clear Completed ({{ int.to_string(counts.completed) }})
   {% endif %}
 </div>
 
 <span hx-swap-oob="innerHTML" id="todo-count">
-  <strong>{{ int.to_string(remaining_count) }}</strong> todos left
+  <strong>{{ int.to_string(counts.active) }}</strong> todos left
 </span>
