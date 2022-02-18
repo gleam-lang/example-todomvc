@@ -13,6 +13,7 @@ import gleam/pgo
 import todomvc/templates/home as home_template
 import todomvc/templates/item as item_template
 import todomvc/templates/item_created as item_created_template
+import todomvc/templates/item_changed as item_changed_template
 import todomvc/templates/item_deleted as item_deleted_template
 import todomvc/item.{Item}
 import todomvc/error
@@ -138,9 +139,9 @@ fn delete_item(request: web.AppRequest, id: String) -> web.AppResult {
 fn item_completion(request: web.AppRequest, id: String) -> web.AppResult {
   try id = web.parse_int(id)
   try item = item.toggle_completion(id, request.user_id, request.db)
+  let counts = item.get_counts(request.user_id, request.db)
 
-  item
-  |> item_template.render_builder
+  item_changed_template.render_builder(item, counts)
   |> web.html_response(200)
   |> Ok
 }

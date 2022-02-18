@@ -1,0 +1,18 @@
+{> with item as Item
+{> with counts as Counts
+
+{> import todomvc/templates/item as item_template
+{> import todomvc/item.{Item, Counts}
+{> import gleam/int
+
+{[ item_template.render_builder(item) ]}
+
+<div hx-swap-oob="innerHTML" id="clear-completed">
+  {% if item.any_completed(counts) %}
+  Clear Completed ({{ int.to_string(counts.completed) }})
+  {% endif %}
+</div>
+
+<span hx-swap-oob="innerHTML" id="todo-count">
+  <strong>{{ int.to_string(counts.active) }}</strong> todos left
+</span>
