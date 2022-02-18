@@ -10,7 +10,10 @@ pub fn render_builder(item item: Item, counts counts: Counts) -> StringBuilder {
 
 ")
   let builder =
-    string_builder.append_builder(builder, item_template.render_builder(item))
+    string_builder.append_builder(
+      builder,
+      item_template.render_builder(item, False),
+    )
   let builder =
     string_builder.append(
       builder,

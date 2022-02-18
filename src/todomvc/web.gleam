@@ -129,6 +129,7 @@ pub fn escape(text: String) -> String {
   |> string.replace("&", "&amp;")
   |> string.replace("<", "&lt;")
   |> string.replace(">", "&gt;")
+  |> string.replace("\"", "&quot;")
 }
 
 pub fn not_found() -> Response(StringBuilder) {

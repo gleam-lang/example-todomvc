@@ -7,7 +7,7 @@
 
 <ul hx-swap-oob="innerHTML" id="todo-list">
   {% for item as Item in items %}
-  {[ item_template.render_builder(item) ]}
+  {[ item_template.render_builder(item,False) ]}
   {% endfor %}
 </ul>
 

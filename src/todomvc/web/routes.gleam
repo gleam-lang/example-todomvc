@@ -123,13 +123,17 @@ fn todo_item(request: web.AppRequest, id: String) -> web.AppResult {
   case request.method {
     http.Get -> get_todo_edit_form(request, id)
     http.Delete -> delete_item(request, id)
-    http.Put -> update_todo(request, id)
+    http.Patch -> update_todo(request, id)
     _ -> Error(error.MethodNotAllowed)
   }
 }
 
-fn get_todo_edit_form(request: web.AppRequest, _id: String) -> web.AppResult {
-  todo
+fn get_todo_edit_form(request: web.AppRequest, id: String) -> web.AppResult {
+  try id = web.parse_int(id)
+  try item = item.get_item(id, request.user_id, request.db)
+  item_template.render_builder(item, True)
+  |> web.html_response(200)
+  |> Ok
 }
 
 fn update_todo(request: web.AppRequest, _id: String) -> web.AppResult {

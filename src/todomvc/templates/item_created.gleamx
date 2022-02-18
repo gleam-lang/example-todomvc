@@ -15,7 +15,7 @@
 >
 
 <div hx-swap-oob="afterbegin" id="todo-list">
-  {[ item_template.render_builder(item) ]}
+  {[ item_template.render_builder(item,False) ]}
 </div>
 
 <div hx-swap-oob="innerHTML" id="clear-completed">

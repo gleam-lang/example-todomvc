@@ -1,6 +1,6 @@
 import gleam/pgo
 import gleam/list
-import gleam/dynamic.{Dynamic}
+import gleam/dynamic
 import gleam/result
 import todomvc/error.{AppError}
 
@@ -85,6 +85,41 @@ returning
 
   assert [id] = result.rows
   Ok(id)
+}
+
+/// Get a specific item for a user.
+///
+pub fn get_item(
+  item_id: Int,
+  user_id: Int,
+  db: pgo.Connection,
+) -> Result(Item, AppError) {
+  let sql =
+    "
+select
+  id,
+  completed,
+  content
+from
+  items
+where
+  id = $1
+and
+  user_id = $2
+"
+
+  assert Ok(result) =
+    pgo.execute(
+      sql,
+      on: db,
+      with: [pgo.int(item_id), pgo.int(user_id)],
+      expecting: item_row_decoder(),
+    )
+
+  case result.rows {
+    [item] -> Ok(item)
+    _ -> Error(error.NotFound)
+  }
 }
 
 /// List all the items for a user that have a particular completion state.

@@ -5,7 +5,7 @@
 {> import todomvc/item.{Item, Counts}
 {> import gleam/int
 
-{[ item_template.render_builder(item) ]}
+{[ item_template.render_builder(item,False) ]}
 
 <div hx-swap-oob="innerHTML" id="clear-completed">
   {% if item.any_completed(counts) %}
