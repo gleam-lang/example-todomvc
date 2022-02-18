@@ -71,8 +71,9 @@ fn home(request: web.AppRequest, category: ItemsCategory) -> web.AppResult {
     Active -> item.filtered_items(request.user_id, False, request.db)
     Completed -> item.filtered_items(request.user_id, True, request.db)
   }
+  let counts = item.get_counts(request.user_id, request.db)
 
-  home_template.render_builder(items)
+  home_template.render_builder(items, counts)
   |> web.html_response(200)
   |> Ok
 }

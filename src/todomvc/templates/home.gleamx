@@ -1,10 +1,11 @@
 {> with items as List(Item)
-{> with items as Counts
+{> with counts as Counts
 
 {> import todomvc/templates/item as item_template
 {> import todomvc/item.{Item, Counts}
 {> import gleam/result
 {> import gleam/list
+{> import gleam/int
 
 <!DOCTYPE html>
 <html lang="en">

@@ -1,11 +1,15 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
 import todomvc/templates/item as item_template
-import todomvc/item.{Item}
+import todomvc/item.{Counts, Item}
 import gleam/result
 import gleam/list
+import gleam/int
 
-pub fn render_builder(items items: List(Item)) -> StringBuilder {
+pub fn render_builder(
+  items items: List(Item),
+  counts counts: Counts,
+) -> StringBuilder {
   let builder = string_builder.from_string("")
   let builder =
     string_builder.append(
@@ -101,7 +105,13 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
       <footer class=\"footer\">
         <!-- TODO: count -->
         <span id=\"todo-count\" class=\"todo-count\">
-          <strong>0</strong> todos left
+          <strong>",
+    )
+  let builder = string_builder.append(builder, int.to_string(counts.active))
+  let builder =
+    string_builder.append(
+      builder,
+      "</strong> todos left
         </span>
         <ul class=\"filters\">
           <!-- TODO: highlight selected -->
@@ -113,7 +123,27 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
 
         <!-- TODO: clear -->
         <!-- TODO: counter -->
-        <button id=\"clear-completed\" class=\"clear-completed\">Clear Completed (1)</button>
+        <button id=\"clear-completed\" class=\"clear-completed\">
+          ",
+    )
+  let builder = case item.any_completed(counts) {
+    True -> {
+      let builder =
+        string_builder.append(builder, "
+          Clear Completed (")
+      let builder =
+        string_builder.append(builder, int.to_string(counts.completed))
+      let builder = string_builder.append(builder, ")
+          ")
+      builder
+    }
+    False -> builder
+  }
+  let builder =
+    string_builder.append(
+      builder,
+      "
+        </button>
       </footer>
     </section>
 
@@ -133,6 +163,6 @@ pub fn render_builder(items items: List(Item)) -> StringBuilder {
   builder
 }
 
-pub fn render(items items: List(Item)) -> String {
-  string_builder.to_string(render_builder(items: items))
+pub fn render(items items: List(Item), counts counts: Counts) -> String {
+  string_builder.to_string(render_builder(items: items, counts: counts))
 }
