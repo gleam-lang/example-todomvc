@@ -1,4 +1,4 @@
-import todomvc/web/service
+import todomvc/web/routes
 import gleam/io
 import gleam/int
 import gleam/string
@@ -16,6 +16,9 @@ pub fn main() {
     |> result.then(int.parse)
     |> result.unwrap(3000)
 
+  // TODO: load the application secret from the environment
+  let application_secret = "27434b28994f498182d459335258fb6e"
+
   io.println(string.concat([
     "Listening on localhost:",
     int.to_string(port),
@@ -23,11 +26,12 @@ pub fn main() {
   ]))
 
   let db = start_database_connection_pool()
-  let web = service.stack(db)
+  let web = routes.stack(application_secret, db)
   assert Ok(_) = elli.become(web, on_port: port)
 }
 
 pub fn start_database_connection_pool() -> pgo.Connection {
+  // TODO: load the database config from the environment
   pgo.connect(
     pgo.Config(
       ..pgo.default_config(),

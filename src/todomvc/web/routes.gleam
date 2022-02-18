@@ -4,6 +4,8 @@ import gleam/http/request.{Request}
 import gleam/http/response
 import gleam/http
 import gleam/function
+import gleam/bit_string
+import gleam/string_builder.{StringBuilder}
 import gleam/pgo
 import todomvc/templates/home as home_template
 import todomvc/templates/item_created as item_created_template
@@ -14,10 +16,10 @@ import todomvc/web
 import todomvc/web/static
 import todomvc/web/print_requests
 
-pub fn router(request: Request(BitString), db: pgo.Connection) -> web.Result {
-  case request.path_segments(request) {
-    [] -> home(All)
-    ["active"] -> home(Active)
+pub fn router(request: web.AppRequest) -> web.AppResult {
+  case request.path {
+    [] -> home(request, All)
+    ["active"] -> home(request, Active)
     ["completed"] -> completed(request)
     ["todos"] -> todos(request)
     ["todos", id] -> todo_item(request, id)
@@ -25,13 +27,29 @@ pub fn router(request: Request(BitString), db: pgo.Connection) -> web.Result {
   }
 }
 
-pub fn stack(db: pgo.Connection) -> Service(BitString, BitBuilder) {
-  router(_, db)
+pub fn stack(
+  secret: String,
+  db: pgo.Connection,
+) -> Service(BitString, BitBuilder) {
+  router
+  |> web.authenticate(secret, db)
   |> function.compose(web.result_to_response)
-  |> service.prepend_response_header("made-with", "Gleam")
+  |> string_body_middleware
   |> service.map_response_body(bit_builder.from_string_builder)
   |> print_requests.middleware
   |> static.middleware()
+  |> service.prepend_response_header("made-with", "Gleam")
+}
+
+pub fn string_body_middleware(
+  service: Service(String, StringBuilder),
+) -> Service(BitString, StringBuilder) {
+  fn(request: Request(BitString)) {
+    case bit_string.to_string(request.body) {
+      Ok(body) -> service(request.set_body(request, body))
+      Error(_) -> web.bad_request()
+    }
+  }
 }
 
 pub type ItemsCategory {
@@ -40,7 +58,7 @@ pub type ItemsCategory {
   Completed
 }
 
-fn home(_category: ItemsCategory) -> web.Result {
+fn home(request: web.AppRequest, _category: ItemsCategory) -> web.AppResult {
   let items = [
     Item(id: 1, completed: True, content: "Create Gleam"),
     Item(id: 2, completed: False, content: "Write TodoMVC in Gleam"),
@@ -53,22 +71,22 @@ fn home(_category: ItemsCategory) -> web.Result {
   |> Ok
 }
 
-fn completed(request: Request(BitString)) -> web.Result {
+fn completed(request: web.AppRequest) -> web.AppResult {
   case request.method {
-    http.Get -> home(Completed)
+    http.Get -> home(request, Completed)
     http.Delete -> todo
     _ -> Error(error.MethodNotAllowed)
   }
 }
 
-fn todos(request: Request(BitString)) -> web.Result {
+fn todos(request: web.AppRequest) -> web.AppResult {
   case request.method {
     http.Post -> create_todo(request)
     _ -> Error(error.MethodNotAllowed)
   }
 }
 
-fn create_todo(_request: Request(BitString)) -> web.Result {
+fn create_todo(_request: web.AppRequest) -> web.AppResult {
   // TODO: create item
   let item = Item(id: 5, completed: False, content: "wibble")
   item_created_template.render_builder(
@@ -84,7 +102,7 @@ fn create_todo(_request: Request(BitString)) -> web.Result {
   |> Ok
 }
 
-fn todo_item(request: Request(BitString), id: String) -> web.Result {
+fn todo_item(request: web.AppRequest, id: String) -> web.AppResult {
   case request.method {
     http.Get -> todo
     http.Delete -> delete_item(request, id)
@@ -93,7 +111,7 @@ fn todo_item(request: Request(BitString), id: String) -> web.Result {
   }
 }
 
-fn delete_item(_request: Request(BitString), _id: String) -> web.Result {
+fn delete_item(request: web.AppRequest, _id: String) -> web.AppResult {
   // TODO: delete item
   item_deleted_template.render_builder(
     // TODO: count

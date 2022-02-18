@@ -1,6 +1,6 @@
 import gleam/pgo
 import gleam/list
-import gleam/dynamic
+import gleam/dynamic.{Dynamic}
 import gleam/result
 import todomvc/error.{AppError}
 
@@ -8,10 +8,23 @@ pub type Item {
   Item(id: Int, completed: Bool, content: String)
 }
 
+/// Decode an item from a database row.
+///
+pub fn item_row_decoder() -> dynamic.Decoder(Item) {
+  dynamic.decode3(
+    Item,
+    dynamic.element(0, dynamic.int),
+    dynamic.element(1, dynamic.bool),
+    dynamic.element(2, dynamic.string),
+  )
+}
+
 pub type Counts {
   Counts(completed: Int, active: Int)
 }
 
+/// Count the number of completed and active items in the database for a user.
+///
 pub fn get_counts(user_id: Int, db: pgo.Connection) -> Counts {
   let sql =
     "
@@ -45,6 +58,8 @@ order by
   Counts(active: active, completed: completed)
 }
 
+/// Insert a new item for a given user.
+///
 pub fn insert_item(
   content: String,
   user_id: Int,
@@ -72,6 +87,42 @@ returning
   Ok(id)
 }
 
+/// List all the items for a user that have a particular completion state.
+///
+pub fn filtered_items(
+  user_id: Int,
+  completed: Bool,
+  db: pgo.Connection,
+) -> List(Item) {
+  let sql =
+    "
+select
+  id,
+  completed,
+  content
+from
+  items
+where
+  user_id = $1
+and
+  completed = $2
+order by
+  inserted_at asc
+"
+
+  assert Ok(result) =
+    pgo.execute(
+      sql,
+      on: db,
+      with: [pgo.int(user_id), pgo.bool(completed)],
+      expecting: item_row_decoder(),
+    )
+
+  result.rows
+}
+
+/// List all the items for a user.
+///
 pub fn list_items(user_id: Int, db: pgo.Connection) -> List(Item) {
   let sql =
     "
@@ -92,17 +143,14 @@ order by
       sql,
       on: db,
       with: [pgo.int(user_id)],
-      expecting: dynamic.decode3(
-        Item,
-        dynamic.element(0, dynamic.int),
-        dynamic.element(1, dynamic.bool),
-        dynamic.element(2, dynamic.string),
-      ),
+      expecting: item_row_decoder(),
     )
 
   result.rows
 }
 
+/// Delete a specific item belonging to a user.
+///
 pub fn delete_item(item_id: Int, user_id: Int, db: pgo.Connection) -> Bool {
   let sql = "
 delete from
@@ -122,6 +170,8 @@ and
   result.count > 0
 }
 
+/// Delete a specific item belonging to a user.
+///
 pub fn delete_completed(user_id: Int, db: pgo.Connection) -> Int {
   let sql = "
 delete from
@@ -136,6 +186,8 @@ and
   result.count
 }
 
+/// Toggle the completion state for specific item belonging to a user.
+///
 pub fn toggle_completion(
   item_id: Int,
   user_id: Int,
