@@ -184,3 +184,8 @@ pub fn ensure_method(
     False -> Error(error.MethodNotAllowed)
   }
 }
+
+/// Working around a current limitation in the `gleam-templates` project
+pub fn are_equal(a: t, b: t) -> Bool {
+  a == b
+}

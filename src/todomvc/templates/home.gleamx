@@ -1,8 +1,10 @@
 {> with items as List(Item)
 {> with counts as Counts
+{> with category as Category
 
 {> import todomvc/templates/item as item_template
-{> import todomvc/item.{Item, Counts}
+{> import todomvc/item.{Item, Counts, Category}
+{> import todomvc/web
 {> import gleam/result
 {> import gleam/list
 {> import gleam/int
@@ -71,22 +73,22 @@
         </ul>
       </section>
 
-      <!-- TODO: filters -->
       <footer class="footer">
-        <!-- TODO: count -->
         <span id="todo-count" class="todo-count">
           <strong>{{ int.to_string(counts.active) }}</strong> todos left
         </span>
         <ul class="filters">
-          <!-- TODO: highlight selected -->
-          <!-- TODO: set selected depending on which page we're on -->
-          <li><a class="" href="/">All</a></li>
-          <li><a class="" href="/active">Active</a></li>
-          <li><a class="selected" href="/completed">Completed</a></li>
+          <li>
+            <a hx-boost="true" class="{% if web.are_equal(category,item.All) %}selected{% endif %}" href="/">All</a>
+          </li>
+          <li>
+            <a hx-boost="true" class="{% if web.are_equal(category,item.Active) %}selected{% endif %}" href="/active">Active</a>
+          </li>
+          <li>
+            <a hx-boost="true" class="{% if web.are_equal(category,item.Completed) %}selected{% endif %}" href="/completed">Completed</a>
+          </li>
         </ul>
 
-        <!-- TODO: clear -->
-        <!-- TODO: counter -->
         <button
           id="clear-completed"
           class="clear-completed"

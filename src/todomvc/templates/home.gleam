@@ -1,7 +1,8 @@
 import gleam/string_builder.{StringBuilder}
 import gleam/list
 import todomvc/templates/item as item_template
-import todomvc/item.{Counts, Item}
+import todomvc/item.{Category, Counts, Item}
+import todomvc/web
 import gleam/result
 import gleam/list
 import gleam/int
@@ -9,6 +10,7 @@ import gleam/int
 pub fn render_builder(
   items items: List(Item),
   counts counts: Counts,
+  category category: Category,
 ) -> StringBuilder {
   let builder = string_builder.from_string("")
   let builder =
@@ -101,9 +103,7 @@ pub fn render_builder(
         </ul>
       </section>
 
-      <!-- TODO: filters -->
       <footer class=\"footer\">
-        <!-- TODO: count -->
         <span id=\"todo-count\" class=\"todo-count\">
           <strong>",
     )
@@ -116,9 +116,51 @@ pub fn render_builder(
         <ul class=\"filters\">
           <!-- TODO: highlight selected -->
           <!-- TODO: set selected depending on which page we're on -->
-          <li><a class=\"\" href=\"/\">All</a></li>
-          <li><a class=\"\" href=\"/active\">Active</a></li>
-          <li><a class=\"selected\" href=\"/completed\">Completed</a></li>
+          <li>
+            <a hx-boost=\"true\" class=\"",
+    )
+  let builder = case web.are_equal(category, item.All) {
+    True -> {
+      let builder = string_builder.append(builder, "selected")
+      builder
+    }
+    False -> builder
+  }
+  let builder =
+    string_builder.append(
+      builder,
+      "\" href=\"/\">All</a>
+          </li>
+          <li>
+            <a hx-boost=\"true\" class=\"",
+    )
+  let builder = case web.are_equal(category, item.Active) {
+    True -> {
+      let builder = string_builder.append(builder, "selected")
+      builder
+    }
+    False -> builder
+  }
+  let builder =
+    string_builder.append(
+      builder,
+      "\" href=\"/active\">Active</a>
+          </li>
+          <li>
+            <a hx-boost=\"true\" class=\"",
+    )
+  let builder = case web.are_equal(category, item.Completed) {
+    True -> {
+      let builder = string_builder.append(builder, "selected")
+      builder
+    }
+    False -> builder
+  }
+  let builder =
+    string_builder.append(
+      builder,
+      "\" href=\"/completed\">Completed</a>
+          </li>
         </ul>
 
         <!-- TODO: clear -->
@@ -167,6 +209,14 @@ pub fn render_builder(
   builder
 }
 
-pub fn render(items items: List(Item), counts counts: Counts) -> String {
-  string_builder.to_string(render_builder(items: items, counts: counts))
+pub fn render(
+  items items: List(Item),
+  counts counts: Counts,
+  category category: Category,
+) -> String {
+  string_builder.to_string(render_builder(
+    items: items,
+    counts: counts,
+    category: category,
+  ))
 }

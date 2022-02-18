@@ -8,6 +8,16 @@ pub type Item {
   Item(id: Int, completed: Bool, content: String)
 }
 
+pub type Category {
+  All
+  Active
+  Completed
+}
+
+pub type Counts {
+  Counts(completed: Int, active: Int)
+}
+
 /// Decode an item from a database row.
 ///
 pub fn item_row_decoder() -> dynamic.Decoder(Item) {
@@ -17,10 +27,6 @@ pub fn item_row_decoder() -> dynamic.Decoder(Item) {
     dynamic.element(1, dynamic.bool),
     dynamic.element(2, dynamic.string),
   )
-}
-
-pub type Counts {
-  Counts(completed: Int, active: Int)
 }
 
 /// Count the number of completed and active items in the database for a user.

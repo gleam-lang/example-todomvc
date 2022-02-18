@@ -18,7 +18,7 @@ import todomvc/templates/item_deleted as item_deleted_template
 import todomvc/templates/completed_cleared as completed_cleared_template
 import todomvc/item.{Item}
 import todomvc/error
-import todomvc/log
+import todomvc/item.{Category}
 import todomvc/web
 import todomvc/web/static
 import todomvc/web/print_requests
@@ -26,8 +26,8 @@ import gleam/io
 
 pub fn router(request: web.AppRequest) -> web.AppResult {
   case request.path {
-    [] -> home(request, All)
-    ["active"] -> home(request, Active)
+    [] -> home(request, item.All)
+    ["active"] -> home(request, item.Active)
     ["completed"] -> completed(request)
     ["todos"] -> todos(request)
     ["todos", id] -> todo_item(request, id)
@@ -61,28 +61,22 @@ pub fn string_body_middleware(
   }
 }
 
-pub type ItemsCategory {
-  All
-  Active
-  Completed
-}
-
-fn home(request: web.AppRequest, category: ItemsCategory) -> web.AppResult {
+fn home(request: web.AppRequest, category: Category) -> web.AppResult {
   let items = case category {
-    All -> item.list_items(request.user_id, request.db)
-    Active -> item.filtered_items(request.user_id, False, request.db)
-    Completed -> item.filtered_items(request.user_id, True, request.db)
+    item.All -> item.list_items(request.user_id, request.db)
+    item.Active -> item.filtered_items(request.user_id, False, request.db)
+    item.Completed -> item.filtered_items(request.user_id, True, request.db)
   }
   let counts = item.get_counts(request.user_id, request.db)
 
-  home_template.render_builder(items, counts)
+  home_template.render_builder(items, counts, category)
   |> web.html_response(200)
   |> Ok
 }
 
 fn completed(request: web.AppRequest) -> web.AppResult {
   case request.method {
-    http.Get -> home(request, Completed)
+    http.Get -> home(request, item.Completed)
     http.Delete -> delete_completed(request)
     _ -> Error(error.MethodNotAllowed)
   }
@@ -94,7 +88,6 @@ fn delete_completed(request: web.AppRequest) -> web.AppResult {
   let items = item.list_items(request.user_id, request.db)
   let counts = item.get_counts(request.user_id, request.db)
 
-  log.info("Completed items cleared")
   completed_cleared_template.render_builder(items, counts)
   |> web.html_response(201)
   |> Ok
@@ -114,7 +107,6 @@ fn create_todo(request: web.AppRequest) -> web.AppResult {
   let item = Item(id: id, completed: False, content: content)
   let counts = item.get_counts(request.user_id, request.db)
 
-  log.info("Item created")
   item_created_template.render_builder(item: item, counts: counts)
   |> web.html_response(201)
   |> Ok
