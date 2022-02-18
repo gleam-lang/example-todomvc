@@ -3,6 +3,9 @@ import gleam/http/service.{Service}
 import gleam/http/request.{Request}
 import gleam/http/response
 import gleam/http
+import gleam/uri
+import gleam/list
+import gleam/result
 import gleam/function
 import gleam/bit_string
 import gleam/string_builder.{StringBuilder}
@@ -12,6 +15,7 @@ import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_deleted as item_deleted_template
 import todomvc/item.{Item}
 import todomvc/error
+import todomvc/log
 import todomvc/web
 import todomvc/web/static
 import todomvc/web/print_requests
@@ -58,13 +62,12 @@ pub type ItemsCategory {
   Completed
 }
 
-fn home(request: web.AppRequest, _category: ItemsCategory) -> web.AppResult {
-  let items = [
-    Item(id: 1, completed: True, content: "Create Gleam"),
-    Item(id: 2, completed: False, content: "Write TodoMVC in Gleam"),
-    Item(id: 3, completed: False, content: "Deploy TodoMVC"),
-    Item(id: 4, completed: False, content: "<script>alert(1)</script>"),
-  ]
+fn home(request: web.AppRequest, category: ItemsCategory) -> web.AppResult {
+  let items = case category {
+    All -> item.list_items(request.user_id, request.db)
+    Active -> item.filtered_items(request.user_id, False, request.db)
+    Completed -> item.filtered_items(request.user_id, True, request.db)
+  }
 
   home_template.render_builder(items)
   |> web.html_response(200)
@@ -86,11 +89,18 @@ fn todos(request: web.AppRequest) -> web.AppResult {
   }
 }
 
-fn create_todo(_request: web.AppRequest) -> web.AppResult {
-  // TODO: create item
-  let item = Item(id: 5, completed: False, content: "wibble")
+fn create_todo(request: web.AppRequest) -> web.AppResult {
+  try params = web.parse_urlencoded_body(request)
+  try content =
+    list.key_find(params, "content")
+    |> result.replace_error(error.UnprocessableEntity)
+  try id =
+    item.insert_item(content, request.user_id, request.db)
+    |> result.replace_error(error.UnprocessableEntity)
+  log.info("Item created")
+
   item_created_template.render_builder(
-    item: item,
+    item: Item(id: id, completed: False, content: content),
     // TODO: count
     completed_count: 5,
     // TODO: count
@@ -104,11 +114,19 @@ fn create_todo(_request: web.AppRequest) -> web.AppResult {
 
 fn todo_item(request: web.AppRequest, id: String) -> web.AppResult {
   case request.method {
-    http.Get -> todo
+    http.Get -> get_todo_edit_form(request, id)
     http.Delete -> delete_item(request, id)
-    http.Put -> todo
+    http.Put -> update_todo(request, id)
     _ -> Error(error.MethodNotAllowed)
   }
+}
+
+fn get_todo_edit_form(request: web.AppRequest, _id: String) -> web.AppResult {
+  todo
+}
+
+fn update_todo(request: web.AppRequest, _id: String) -> web.AppResult {
+  todo
 }
 
 fn delete_item(request: web.AppRequest, _id: String) -> web.AppResult {

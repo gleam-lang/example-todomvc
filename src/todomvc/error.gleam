@@ -3,4 +3,5 @@ pub type AppError {
   MethodNotAllowed
   UserNotFound
   BadRequest
+  UnprocessableEntity
 }

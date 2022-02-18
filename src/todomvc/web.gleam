@@ -5,6 +5,7 @@ import gleam/http.{Http}
 import gleam/http/cookie
 import gleam/http/response.{Response}
 import gleam/http/request.{Request}
+import gleam/uri
 import gleam/string_builder.{StringBuilder}
 import gleam/bit_string
 import gleam/option.{Option}
@@ -69,6 +70,12 @@ pub fn authenticate(
   }
 }
 
+/// Fetch the current user's id number from the `uid` cookie, returning `None`
+/// if there is none.
+///
+/// The cookie's value is signed and if it is found to have been tampered with
+/// then an error is returned.
+///
 pub fn user_id_from_cookies(
   request: Request(t),
   secret: String,
@@ -97,11 +104,14 @@ pub fn result_to_response(result: AppResult) -> Response(StringBuilder) {
   }
 }
 
+/// Return an appropriate HTTP response for a given error.
+///
 pub fn error_to_response(error: AppError) -> Response(StringBuilder) {
   case error {
     error.NotFound | error.UserNotFound -> not_found()
     error.MethodNotAllowed -> method_not_allowed()
     error.BadRequest -> bad_request()
+    error.UnprocessableEntity -> unprocessable_entity()
   }
 }
 
@@ -137,4 +147,17 @@ pub fn bad_request() -> Response(StringBuilder) {
   let body = string_builder.from_string("Bad request")
   response.new(400)
   |> response.set_body(body)
+}
+
+pub fn unprocessable_entity() -> Response(StringBuilder) {
+  let body = string_builder.from_string("Unprocessable entity")
+  response.new(422)
+  |> response.set_body(body)
+}
+
+pub fn parse_urlencoded_body(
+  request: AppRequest,
+) -> Result(List(#(String, String)), AppError) {
+  uri.parse_query(request.body)
+  |> result.replace_error(error.BadRequest)
 }
