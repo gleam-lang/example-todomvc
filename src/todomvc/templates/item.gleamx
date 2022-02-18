@@ -52,6 +52,7 @@
     required
     class="edit"
     type="text"
+    name="content"
     value="{{ web.escape(item.content) }}"
     hx-patch="/todos/{{ int.to_string(item.id) }}"
     hx-target="#item-{{ int.to_string(item.id) }}"

@@ -212,7 +212,7 @@ pub fn update_item(
   user_id: Int,
   content: String,
   db: pgo.Connection,
-) -> Bool {
+) -> Result(Item, AppError) {
   let sql =
     "
 update
@@ -223,15 +223,22 @@ where
   id = $1
 and
   user_id = $2
+returning
+  id,
+  completed,
+  content
 "
   assert Ok(result) =
     pgo.execute(
       sql,
       on: db,
       with: [pgo.int(item_id), pgo.int(user_id), pgo.text(content)],
-      expecting: Ok,
+      expecting: item_row_decoder(),
     )
-  result.count > 0
+  case result.rows {
+    [item] -> Ok(item)
+    _ -> Error(error.NotFound)
+  }
 }
 
 /// Delete a specific item belonging to a user.

@@ -131,6 +131,7 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
     required
     class=\"edit\"
     type=\"text\"
+    name=\"content\"
     value=\"",
     )
   let builder = string_builder.append(builder, web.escape(item.content))

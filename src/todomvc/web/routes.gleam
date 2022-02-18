@@ -22,6 +22,7 @@ import todomvc/log
 import todomvc/web
 import todomvc/web/static
 import todomvc/web/print_requests
+import gleam/io
 
 pub fn router(request: web.AppRequest) -> web.AppResult {
   case request.path {
@@ -136,8 +137,15 @@ fn get_todo_edit_form(request: web.AppRequest, id: String) -> web.AppResult {
   |> Ok
 }
 
-fn update_todo(request: web.AppRequest, _id: String) -> web.AppResult {
-  todo
+fn update_todo(request: web.AppRequest, id: String) -> web.AppResult {
+  try id = web.parse_int(id)
+  try params = web.parse_urlencoded_body(request)
+  try content = web.key_find(params, "content")
+  try item = item.update_item(id, request.user_id, content, request.db)
+
+  item_template.render_builder(item, False)
+  |> web.html_response(200)
+  |> Ok
 }
 
 fn delete_item(request: web.AppRequest, id: String) -> web.AppResult {
