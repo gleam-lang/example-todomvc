@@ -1,0 +1,16 @@
+{> with items as List(Item)
+{> with counts as Counts
+
+{> import todomvc/templates/item as item_template
+{> import todomvc/item.{Item, Counts}
+{> import gleam/int
+
+<ul hx-swap-oob="innerHTML" id="todo-list">
+  {% for item as Item in items %}
+  {[ item_template.render_builder(item) ]}
+  {% endfor %}
+</ul>
+
+<span hx-swap-oob="innerHTML" id="todo-count">
+  <strong>{{ int.to_string(counts.active) }}</strong> todos left
+</span>

@@ -123,7 +123,11 @@ pub fn render_builder(
 
         <!-- TODO: clear -->
         <!-- TODO: counter -->
-        <button id=\"clear-completed\" class=\"clear-completed\">
+        <button
+          id=\"clear-completed\"
+          class=\"clear-completed\"
+          hx-delete=\"/completed\"
+        >
           ",
     )
   let builder = case item.any_completed(counts) {

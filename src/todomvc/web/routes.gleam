@@ -15,6 +15,7 @@ import todomvc/templates/item as item_template
 import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_changed as item_changed_template
 import todomvc/templates/item_deleted as item_deleted_template
+import todomvc/templates/completed_cleared as completed_cleared_template
 import todomvc/item.{Item}
 import todomvc/error
 import todomvc/log
@@ -86,8 +87,16 @@ fn completed(request: web.AppRequest) -> web.AppResult {
   }
 }
 
+// TODO: handle that we may be on the completed page or something
 fn delete_completed(request: web.AppRequest) -> web.AppResult {
-  todo
+  item.delete_completed(request.user_id, request.db)
+  let items = item.list_items(request.user_id, request.db)
+  let counts = item.get_counts(request.user_id, request.db)
+
+  log.info("Completed items cleared")
+  completed_cleared_template.render_builder(items, counts)
+  |> web.html_response(201)
+  |> Ok
 }
 
 fn todos(request: web.AppRequest) -> web.AppResult {

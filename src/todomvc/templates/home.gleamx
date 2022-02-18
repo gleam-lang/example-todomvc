@@ -87,7 +87,11 @@
 
         <!-- TODO: clear -->
         <!-- TODO: counter -->
-        <button id="clear-completed" class="clear-completed">
+        <button
+          id="clear-completed"
+          class="clear-completed"
+          hx-delete="/completed"
+        >
           {% if item.any_completed(counts) %}
           Clear Completed ({{ int.to_string(counts.completed) }})
           {% endif %}
