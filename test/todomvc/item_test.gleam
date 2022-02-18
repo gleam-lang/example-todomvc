@@ -18,8 +18,8 @@ pub fn item_creation_test() {
 
     item.list_items(user_id, db)
     |> should.equal([
-      Item(id: id1, content: "One", completed: False),
       Item(id: id2, content: "Two", completed: False),
+      Item(id: id1, content: "One", completed: False),
     ])
   })
 }
@@ -151,15 +151,15 @@ pub fn delete_completed_test() {
     // Completed items for that user have been deleted
     item.list_items(user_id1, db)
     |> should.equal([
-      Item(id: id3, completed: False, content: "x"),
       Item(id: id4, completed: False, content: "x"),
+      Item(id: id3, completed: False, content: "x"),
     ])
 
     // The other user's items were not impacted
     item.list_items(user_id2, db)
     |> should.equal([
-      Item(id: id5, completed: False, content: "x"),
       Item(id: id6, completed: True, content: "x"),
+      Item(id: id5, completed: False, content: "x"),
     ])
   })
 }
