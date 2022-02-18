@@ -117,10 +117,49 @@ pub fn delete_other_users_item_test() {
     let user_id2 = user.insert_user(db)
     assert Ok(id) = item.insert_item("x", user_id1, db)
 
+    // It belongs to someone else so it can't be deleted
     item.delete_item(id, user_id2, db)
     |> should.equal(False)
 
     item.list_items(user_id1, db)
     |> should.equal([Item(id: id, completed: False, content: "x")])
+  })
+}
+
+pub fn delete_completed_test() {
+  tests.with_db(fn(db) {
+    let user_id1 = user.insert_user(db)
+    let user_id2 = user.insert_user(db)
+
+    // Create a bunch of items for both users
+    assert Ok(id1) = item.insert_item("x", user_id1, db)
+    assert Ok(id2) = item.insert_item("x", user_id1, db)
+    assert Ok(id3) = item.insert_item("x", user_id1, db)
+    assert Ok(id4) = item.insert_item("x", user_id1, db)
+    assert Ok(id5) = item.insert_item("x", user_id2, db)
+    assert Ok(id6) = item.insert_item("x", user_id2, db)
+
+    // Mark some items as completed for both users
+    assert Ok(_) = item.toggle_completion(id1, user_id1, db)
+    assert Ok(_) = item.toggle_completion(id2, user_id1, db)
+    assert Ok(_) = item.toggle_completion(id6, user_id2, db)
+
+    // Delete completed items for the first user
+    item.delete_completed(user_id1, db)
+    |> should.equal(2)
+
+    // Completed items for that user have been deleted
+    item.list_items(user_id1, db)
+    |> should.equal([
+      Item(id: id3, completed: False, content: "x"),
+      Item(id: id4, completed: False, content: "x"),
+    ])
+
+    // The other user's items were not impacted
+    item.list_items(user_id2, db)
+    |> should.equal([
+      Item(id: id5, completed: False, content: "x"),
+      Item(id: id6, completed: True, content: "x"),
+    ])
   })
 }

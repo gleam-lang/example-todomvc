@@ -122,6 +122,20 @@ and
   result.count > 0
 }
 
+pub fn delete_completed(user_id: Int, db: pgo.Connection) -> Int {
+  let sql = "
+delete from
+  items
+where
+  user_id = $1
+and
+  completed = true
+"
+  assert Ok(result) =
+    pgo.execute(sql, on: db, with: [pgo.int(user_id)], expecting: Ok)
+  result.count
+}
+
 pub fn toggle_completion(
   item_id: Int,
   user_id: Int,
