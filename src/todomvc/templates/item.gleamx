@@ -9,8 +9,12 @@
   {% if item.completed %}class="completed"{% endif %}
 >
   <div class="view">
-    <!-- TODO: edit -->
-    <input class="toggle" type="checkbox" {% if item.completed %}checked{% endif %}>
+    <input
+      class="toggle"
+      type="checkbox"
+      autocomplete="off"
+      {% if item.completed %}checked{% endif %}
+    >
 
     <label>
       {{ web.escape(item.content) }}
@@ -27,7 +31,12 @@
     </form>
 
     <!-- TODO: toggle completion -->
-    <form class="todo-mark" method="post" action="/todo/{{ int.to_string(item.id) }}">
+    <form
+      class="todo-mark"
+      hx-patch="/todos/{{ int.to_string(item.id) }}/completion"
+      hx-target="#item-{{ int.to_string(item.id) }}"
+      hx-swap="outerHTML"
+    >
       <button></button>
     </form>
   </div>

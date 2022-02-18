@@ -170,6 +170,35 @@ and
   result.count > 0
 }
 
+/// Update the content of a specific item belonging to a user.
+///
+pub fn update_item(
+  item_id: Int,
+  user_id: Int,
+  content: String,
+  db: pgo.Connection,
+) -> Bool {
+  let sql =
+    "
+update
+  items
+set
+  content = $3
+where
+  id = $1
+and
+  user_id = $2
+"
+  assert Ok(result) =
+    pgo.execute(
+      sql,
+      on: db,
+      with: [pgo.int(item_id), pgo.int(user_id), pgo.text(content)],
+      expecting: Ok,
+    )
+  result.count > 0
+}
+
 /// Delete a specific item belonging to a user.
 ///
 pub fn delete_completed(user_id: Int, db: pgo.Connection) -> Int {
@@ -192,7 +221,7 @@ pub fn toggle_completion(
   item_id: Int,
   user_id: Int,
   db: pgo.Connection,
-) -> Result(Bool, Nil) {
+) -> Result(Item, AppError) {
   let sql =
     "
 update
@@ -204,19 +233,21 @@ where
 and
   user_id = $2
 returning
-  completed
+  id,
+  completed,
+  content
 "
   assert Ok(result) =
     pgo.execute(
       sql,
       on: db,
       with: [pgo.int(item_id), pgo.int(user_id)],
-      expecting: dynamic.element(0, dynamic.bool),
+      expecting: item_row_decoder(),
     )
 
   case result.rows {
     [completed] -> Ok(completed)
-    _ -> Error(Nil)
+    _ -> Error(error.NotFound)
   }
 }
 

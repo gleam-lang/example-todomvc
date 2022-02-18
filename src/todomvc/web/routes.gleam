@@ -11,6 +11,7 @@ import gleam/bit_string
 import gleam/string_builder.{StringBuilder}
 import gleam/pgo
 import todomvc/templates/home as home_template
+import todomvc/templates/item as item_template
 import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_deleted as item_deleted_template
 import todomvc/item.{Item}
@@ -27,6 +28,7 @@ pub fn router(request: web.AppRequest) -> web.AppResult {
     ["completed"] -> completed(request)
     ["todos"] -> todos(request)
     ["todos", id] -> todo_item(request, id)
+    ["todos", id, "completion"] -> item_completion(request, id)
     _ -> Error(error.NotFound)
   }
 }
@@ -97,12 +99,11 @@ fn create_todo(request: web.AppRequest) -> web.AppResult {
   try params = web.parse_urlencoded_body(request)
   try content = web.key_find(params, "content")
   try id = item.insert_item(content, request.user_id, request.db)
-  log.info("Item created")
+  let item = Item(id: id, completed: False, content: content)
+  let counts = item.get_counts(request.user_id, request.db)
 
-  item_created_template.render_builder(
-    item: Item(id: id, completed: False, content: content),
-    counts: item.get_counts(request.user_id, request.db),
-  )
+  log.info("Item created")
+  item_created_template.render_builder(item: item, counts: counts)
   |> web.html_response(201)
   |> Ok
 }
@@ -130,6 +131,16 @@ fn delete_item(request: web.AppRequest, id: String) -> web.AppResult {
 
   item.get_counts(request.user_id, request.db)
   |> item_deleted_template.render_builder
+  |> web.html_response(200)
+  |> Ok
+}
+
+fn item_completion(request: web.AppRequest, id: String) -> web.AppResult {
+  try id = web.parse_int(id)
+  try item = item.toggle_completion(id, request.user_id, request.db)
+
+  item
+  |> item_template.render_builder
   |> web.html_response(200)
   |> Ok
 }

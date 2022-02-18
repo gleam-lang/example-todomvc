@@ -40,9 +40,9 @@ pub fn toggle_test() {
     assert Ok(id1) = item.insert_item("One", user_id, db)
 
     item.toggle_completion(id1, user_id, db)
-    |> should.equal(Ok(True))
+    |> should.equal(Ok(Item(id: id1, completed: True, content: "One")))
     item.toggle_completion(id1, user_id, db)
-    |> should.equal(Ok(False))
+    |> should.equal(Ok(Item(id: id1, completed: False, content: "One")))
   })
 }
 
@@ -51,7 +51,7 @@ pub fn toggle_unknown_id_test() {
     let user_id = user.insert_user(db)
 
     item.toggle_completion(0, user_id, db)
-    |> should.equal(Error(Nil))
+    |> should.equal(Error(error.NotFound))
   })
 }
 
@@ -64,7 +64,7 @@ pub fn toggle_user_mismatch_test() {
     assert Ok(id1) = item.insert_item("One", user_id1, db)
 
     item.toggle_completion(id1, user_id2, db)
-    |> should.equal(Error(Nil))
+    |> should.equal(Error(error.NotFound))
   })
 }
 

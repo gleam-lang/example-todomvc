@@ -173,3 +173,13 @@ pub fn parse_int(string: String) -> Result(Int, AppError) {
   |> int.parse
   |> result.replace_error(error.BadRequest)
 }
+
+pub fn ensure_method(
+  request: AppRequest,
+  method: http.Method,
+) -> Result(Nil, AppError) {
+  case request.method == method {
+    True -> Ok(Nil)
+    False -> Error(error.MethodNotAllowed)
+  }
+}

@@ -26,8 +26,11 @@ pub fn render_builder(item item: Item) -> StringBuilder {
       "
 >
   <div class=\"view\">
-    <!-- TODO: edit -->
-    <input class=\"toggle\" type=\"checkbox\" ",
+    <input
+      class=\"toggle\"
+      type=\"checkbox\"
+      autocomplete=\"off\"
+      ",
     )
   let builder = case item.completed {
     True -> {
@@ -36,7 +39,8 @@ pub fn render_builder(item item: Item) -> StringBuilder {
     }
     False -> builder
   }
-  let builder = string_builder.append(builder, ">
+  let builder = string_builder.append(builder, "
+    >
 
     <label>
       ")
@@ -69,13 +73,21 @@ pub fn render_builder(item item: Item) -> StringBuilder {
     </form>
 
     <!-- TODO: toggle completion -->
-    <form class=\"todo-mark\" method=\"post\" action=\"/todo/",
+    <form
+      class=\"todo-mark\"
+      hx-patch=\"/todos/",
     )
+  let builder = string_builder.append(builder, int.to_string(item.id))
+  let builder =
+    string_builder.append(builder, "/completion\"
+      hx-target=\"#item-")
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(
       builder,
-      "\">
+      "\"
+      hx-swap=\"outerHTML\"
+    >
       <button></button>
     </form>
   </div>
