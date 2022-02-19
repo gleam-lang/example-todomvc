@@ -1,5 +1,6 @@
 {> with item as Item
 {> with counts as Counts
+{> with display as Bool
 
 {> import todomvc/templates/item as item_template
 {> import todomvc/item.{Item, Counts}
@@ -14,9 +15,11 @@
   autocomplete="off"
 >
 
+{% if display %}
 <div hx-swap-oob="afterbegin" id="todo-list">
   {[ item_template.render_builder(item,False) ]}
 </div>
+{% endif %}
 
 <div hx-swap-oob="innerHTML" id="clear-completed">
   {% if item.any_completed(counts) %}

@@ -4,16 +4,30 @@ import todomvc/templates/item as item_template
 import todomvc/item.{Counts, Item}
 import gleam/int
 
-pub fn render_builder(item item: Item, counts counts: Counts) -> StringBuilder {
+pub fn render_builder(
+  item item: Item,
+  counts counts: Counts,
+  display display: Bool,
+) -> StringBuilder {
   let builder = string_builder.from_string("")
   let builder = string_builder.append(builder, "
 
 ")
-  let builder =
-    string_builder.append_builder(
-      builder,
-      item_template.render_builder(item, False),
-    )
+  let builder = case display {
+    True -> {
+      let builder = string_builder.append(builder, "
+")
+      let builder =
+        string_builder.append_builder(
+          builder,
+          item_template.render_builder(item, False),
+        )
+      let builder = string_builder.append(builder, "
+")
+      builder
+    }
+    False -> builder
+  }
   let builder =
     string_builder.append(
       builder,
@@ -51,6 +65,14 @@ pub fn render_builder(item item: Item, counts counts: Counts) -> StringBuilder {
   builder
 }
 
-pub fn render(item item: Item, counts counts: Counts) -> String {
-  string_builder.to_string(render_builder(item: item, counts: counts))
+pub fn render(
+  item item: Item,
+  counts counts: Counts,
+  display display: Bool,
+) -> String {
+  string_builder.to_string(render_builder(
+    item: item,
+    counts: counts,
+    display: display,
+  ))
 }

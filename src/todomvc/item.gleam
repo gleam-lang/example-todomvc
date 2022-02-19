@@ -1,7 +1,8 @@
 import gleam/pgo
 import gleam/list
-import gleam/dynamic
+import gleam/bool
 import gleam/result
+import gleam/dynamic
 import todomvc/error.{AppError}
 
 pub type Item {
@@ -301,4 +302,12 @@ returning
 
 pub fn any_completed(counts: Counts) -> Bool {
   counts.completed > 0
+}
+
+pub fn is_member(item: Item, category: Category) -> Bool {
+  case category {
+    All -> True
+    Completed -> item.completed
+    Active -> bool.negate(item.completed)
+  }
 }

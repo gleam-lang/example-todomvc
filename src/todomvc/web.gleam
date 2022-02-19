@@ -23,6 +23,7 @@ pub type AppRequest {
   AppRequest(
     method: http.Method,
     path: List(String),
+    headers: List(#(String, String)),
     body: String,
     db: pgo.Connection,
     user_id: Int,
@@ -54,6 +55,7 @@ pub fn authenticate(
       service(AppRequest(
         method: request.method,
         path: request.path_segments(request),
+        headers: request.headers,
         body: request.body,
         db: db,
         user_id: id,

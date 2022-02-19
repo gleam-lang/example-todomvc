@@ -114,8 +114,6 @@ pub fn render_builder(
       "</strong> todos left
         </span>
         <ul class=\"filters\">
-          <!-- TODO: highlight selected -->
-          <!-- TODO: set selected depending on which page we're on -->
           <li>
             <a hx-boost=\"true\" class=\"",
     )
@@ -163,8 +161,6 @@ pub fn render_builder(
           </li>
         </ul>
 
-        <!-- TODO: clear -->
-        <!-- TODO: counter -->
         <button
           id=\"clear-completed\"
           class=\"clear-completed\"

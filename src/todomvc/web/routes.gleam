@@ -5,6 +5,7 @@ import gleam/http/response
 import gleam/http
 import gleam/uri
 import gleam/list
+import gleam/string
 import gleam/result
 import gleam/function
 import gleam/bit_string
@@ -106,8 +107,9 @@ fn create_todo(request: web.AppRequest) -> web.AppResult {
   try id = item.insert_item(content, request.user_id, request.db)
   let item = Item(id: id, completed: False, content: content)
   let counts = item.get_counts(request.user_id, request.db)
+  let display = item.is_member(item, active_category(request))
 
-  item_created_template.render_builder(item: item, counts: counts)
+  item_created_template.render_builder(item, counts, display)
   |> web.html_response(201)
   |> Ok
 }
@@ -154,8 +156,24 @@ fn item_completion(request: web.AppRequest, id: String) -> web.AppResult {
   try id = web.parse_int(id)
   try item = item.toggle_completion(id, request.user_id, request.db)
   let counts = item.get_counts(request.user_id, request.db)
+  let display = item.is_member(item, active_category(request))
 
-  item_changed_template.render_builder(item, counts)
+  item_changed_template.render_builder(item, counts, display)
   |> web.html_response(200)
   |> Ok
+}
+
+fn active_category(request: web.AppRequest) -> Category {
+  let current_url =
+    request.headers
+    |> list.key_find("hx-current-url")
+    |> result.unwrap("")
+  case string.contains(current_url, "/active") {
+    True -> item.Active
+    False ->
+      case string.contains(current_url, "/completed") {
+        True -> item.Completed
+        False -> item.All
+      }
+  }
 }
