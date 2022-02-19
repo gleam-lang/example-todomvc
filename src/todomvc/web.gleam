@@ -45,7 +45,7 @@ pub fn authenticate(
 
     let #(id, new_user) = case id {
       option.None -> {
-        log.info("New user created")
+        log.info("Creating a new user")
         #(user.insert_user(db), True)
       }
       option.Some(id) -> #(id, False)

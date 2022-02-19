@@ -1,0 +1,10 @@
+build
+bin
+test
+README.md
+secrets.env
+Dockerfile
+fly.toml
+.github
+.gitignore
+.git
