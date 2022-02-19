@@ -6,7 +6,7 @@ create table items (
   id serial primary key,
   inserted_at timestamp default now(),
   completed boolean not null default false,
-  content varchar(3000) not null,
+  content varchar(500) not null,
   user_id integer references users (id)
 );
 

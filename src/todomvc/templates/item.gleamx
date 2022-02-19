@@ -50,6 +50,7 @@
     onfocus="this.setSelectionRange(this.value.length,this.value.length)"
     {% endif %}
     required
+    maxlength="500"
     class="edit"
     type="text"
     name="content"
