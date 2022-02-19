@@ -1,7 +1,6 @@
 import gleam/pgo
 import gleam/option
 
-// TODO: make this close the connection even when the test fails
 pub fn with_db(f: fn(pgo.Connection) -> a) -> a {
   let config =
     pgo.Config(

@@ -83,11 +83,13 @@ fn completed(request: web.AppRequest) -> web.AppResult {
   }
 }
 
-// TODO: handle that we may be on the completed page or something
 fn delete_completed(request: web.AppRequest) -> web.AppResult {
   item.delete_completed(request.user_id, request.db)
-  let items = item.list_items(request.user_id, request.db)
   let counts = item.get_counts(request.user_id, request.db)
+  let items = case current_category(request) {
+    item.All | item.Active -> item.list_items(request.user_id, request.db)
+    item.Completed -> []
+  }
 
   completed_cleared_template.render_builder(items, counts)
   |> web.html_response(201)
@@ -107,7 +109,7 @@ fn create_todo(request: web.AppRequest) -> web.AppResult {
   try id = item.insert_item(content, request.user_id, request.db)
   let item = Item(id: id, completed: False, content: content)
   let counts = item.get_counts(request.user_id, request.db)
-  let display = item.is_member(item, active_category(request))
+  let display = item.is_member(item, current_category(request))
 
   item_created_template.render_builder(item, counts, display)
   |> web.html_response(201)
@@ -156,14 +158,14 @@ fn item_completion(request: web.AppRequest, id: String) -> web.AppResult {
   try id = web.parse_int(id)
   try item = item.toggle_completion(id, request.user_id, request.db)
   let counts = item.get_counts(request.user_id, request.db)
-  let display = item.is_member(item, active_category(request))
+  let display = item.is_member(item, current_category(request))
 
   item_changed_template.render_builder(item, counts, display)
   |> web.html_response(200)
   |> Ok
 }
 
-fn active_category(request: web.AppRequest) -> Category {
+fn current_category(request: web.AppRequest) -> Category {
   let current_url =
     request.headers
     |> list.key_find("hx-current-url")
