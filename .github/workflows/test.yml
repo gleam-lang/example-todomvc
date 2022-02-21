@@ -25,7 +25,7 @@ jobs:
           --health-retries 5
 
     env:
-      PGHOST: postgres
+      PGHOST: localhost
       PGUSER: postgres
       PGPASSWORD: postgres
 
