@@ -3,11 +3,22 @@ create table users (
 );
 
 create table items (
-  id serial primary key,
-  inserted_at timestamp default now(),
-  completed boolean not null default false,
-  content varchar(500) not null check (content != ''),
-  user_id integer references users (id)
+  id serial
+    primary key,
+
+  inserted_at timestamp
+    default now(),
+
+  completed boolean 
+    not null
+    default false,
+
+  content varchar(500)
+    not null
+    check (content != ''),
+
+  user_id integer
+    references users (id)
 );
 
 create index items_user_id_completed 
