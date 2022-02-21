@@ -8,18 +8,17 @@ import gleam/string
 
 pub fn middleware(service: Service(in, BitBuilder)) -> Service(in, BitBuilder) {
   fn(request: Request(in)) -> Response(BitBuilder) {
-    case get_asset(request) {
+    let file_contents =
+      request.path
+      |> string.replace("..", "")
+      |> string.append("priv/static/", _)
+      |> file.read_bits
+      |> result.nil_error
+      |> result.map(bit_builder.from_bit_string)
+
+    case file_contents {
       Ok(bits) -> Response(200, [], bits)
       Error(_) -> service(request)
     }
   }
-}
-
-fn get_asset(request: Request(in)) -> Result(BitBuilder, Nil) {
-  request.path
-  |> string.replace("..", "")
-  |> string.append("priv/static/", _)
-  |> file.read_bits
-  |> result.nil_error
-  |> result.map(bit_builder.from_bit_string)
 }

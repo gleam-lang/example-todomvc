@@ -22,7 +22,7 @@ import todomvc/error
 import todomvc/item.{Category}
 import todomvc/web
 import todomvc/web/static
-import todomvc/web/print_requests
+import todomvc/web/log_requests
 import gleam/io
 
 pub fn router(request: web.AppRequest) -> web.AppResult {
@@ -46,7 +46,7 @@ pub fn stack(
   |> function.compose(web.result_to_response)
   |> string_body_middleware
   |> service.map_response_body(bit_builder.from_string_builder)
-  |> print_requests.middleware
+  |> log_requests.middleware
   |> static.middleware()
   |> service.prepend_response_header("made-with", "Gleam")
 }

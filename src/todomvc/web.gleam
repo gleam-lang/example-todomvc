@@ -83,15 +83,10 @@ pub fn user_id_from_cookies(
   secret: String,
 ) -> Result(Option(Int), AppError) {
   case list.key_find(request.get_cookies(request), "uid") {
-    Ok(id) ->
-      crypto.verify_signed_message(id, <<secret:utf8>>)
-      |> result.then(bit_string.to_string)
-      |> result.then(int.parse)
-      |> result.map(option.Some)
-      |> result.map_error(fn(_) {
-        log.info("Ignoring bad uid cookie")
-        error.BadRequest
-      })
+    Ok(id) -> {
+      let id = user.verify_cookie_id(id, secret)
+      result.map(id, option.Some)
+    }
     Error(_) -> Ok(option.None)
   }
 }
