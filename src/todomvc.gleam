@@ -1,4 +1,5 @@
 import todomvc/web/routes
+import todomvc/log
 import gleam/io
 import gleam/int
 import gleam/string
@@ -15,9 +16,10 @@ pub fn main() {
   let application_secret = load_application_secret()
   let db = start_database_connection_pool()
   let web = routes.stack(application_secret, db)
+  log.set_log_level(log.Info)
 
   string.concat(["Listening on localhost:", int.to_string(port), " ✨"])
-  |> io.println
+  |> log.info
 
   assert Ok(_) = elli.become(web, on_port: port)
 }
