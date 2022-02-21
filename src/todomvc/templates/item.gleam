@@ -129,6 +129,7 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
       builder,
       "
     required
+    maxlength=\"500\"
     class=\"edit\"
     type=\"text\"
     name=\"content\"

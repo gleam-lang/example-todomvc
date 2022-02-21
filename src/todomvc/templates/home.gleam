@@ -66,6 +66,7 @@ pub fn render_builder(
           <input
             autofocus
             required
+            maxlength=\"500\"
             class=\"new-todo\"
             placeholder=\"What needs to be complete?\"
             name=\"content\"
