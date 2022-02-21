@@ -12,11 +12,12 @@ import gleam/pgo
 import gleam/io
 
 pub fn main() {
+  log.configure_backend()
+
   let port = load_port()
   let application_secret = load_application_secret()
   let db = start_database_connection_pool()
   let web = routes.stack(application_secret, db)
-  log.set_log_level(log.Info)
 
   string.concat(["Listening on localhost:", int.to_string(port), " ✨"])
   |> log.info
