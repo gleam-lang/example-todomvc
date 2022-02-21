@@ -3,6 +3,7 @@
 set -eu
 export PGUSER=postgres
 export PGPASSWORD=postgres
+export PGHOST=localhost
 
 reset() {
   local database=$1
