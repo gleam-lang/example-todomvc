@@ -12,6 +12,8 @@ jobs:
     services:
       postgres:
         image: postgres
+        ports:
+        - 5432:5432
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
