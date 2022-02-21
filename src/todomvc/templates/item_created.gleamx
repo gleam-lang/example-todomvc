@@ -17,7 +17,7 @@
 >
 
 {% if display %}
-<div hx-swap-oob="afterbegin" id="todo-list">
+<div hx-swap-oob="beforeend" id="todo-list">
   {[ item_template.render_builder(item,False) ]}
 </div>
 {% endif %}

@@ -34,7 +34,7 @@ pub fn render_builder(
         string_builder.append(
           builder,
           "
-<div hx-swap-oob=\"afterbegin\" id=\"todo-list\">
+<div hx-swap-oob=\"beforeend\" id=\"todo-list\">
   ",
         )
       let builder =

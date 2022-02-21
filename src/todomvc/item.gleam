@@ -157,7 +157,7 @@ where
 and
   completed = $2
 order by
-  inserted_at desc
+  inserted_at asc
 "
 
   assert Ok(result) =
@@ -185,7 +185,7 @@ from
 where
   user_id = $1
 order by
-  inserted_at desc
+  inserted_at asc
 "
 
   assert Ok(result) =
