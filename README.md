@@ -1,9 +1,28 @@
-# todomvc
+# TodoMVC
 
-A backend based implementation of [TodoMVC][todomvc] and an example Gleam
-project.
+An example codebase that shows how to create a web application in Gleam. It is a
+backend based implementation of [TodoMVC](https://todomvc.com/) and demonstrates
+these features:
 
-[todomvc]: https://todomvc.com/
+- A HTTP server
+- Routing
+- CRUD
+- Use of a PostgreSQL database
+- HTML templates
+- Form parsing
+- Signed cookie based authentication
+- Serving static assets
+- Logging
+- Testing
+
+Rather than demonstrate any particular frontend web framework this project uses
+[HTMX](https://htmx.org/), a library that adds some new HTML attributes for
+declaratively performing AJAX requests.
+
+## Usage
+
+You will need to have PostgreSQL installed with the user `postgres` with the
+password `postgres`.
 
 ```sh
 bin/reset_dev_database.sh
