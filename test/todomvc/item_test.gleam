@@ -24,6 +24,19 @@ pub fn item_creation_test() {
   })
 }
 
+pub fn item_creation_without_content_test() {
+  tests.with_db(fn(db) {
+    let user_id = user.insert_user(db)
+
+    // Items cannot be added without content
+    item.insert_item("", user_id, db)
+    |> should.equal(Error(error.ContentRequired))
+
+    item.list_items(user_id, db)
+    |> should.equal([])
+  })
+}
+
 pub fn item_with_unknown_user_test() {
   tests.with_db(fn(db) {
     // Items cannot be added for an unknown user

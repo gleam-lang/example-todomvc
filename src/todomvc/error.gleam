@@ -4,4 +4,5 @@ pub type AppError {
   UserNotFound
   BadRequest
   UnprocessableEntity
+  ContentRequired
 }

@@ -88,7 +88,15 @@ returning
       with: [pgo.text(content), pgo.int(user_id)],
       expecting: dynamic.element(0, dynamic.int),
     )
-    |> result.replace_error(error.UserNotFound)
+    |> result.map_error(fn(error) {
+      case error {
+        pgo.ConstraintViolated(constraint: "items_content_check", ..) ->
+          error.ContentRequired
+        pgo.ConstraintViolated(constraint: "items_user_id_fkey", ..) ->
+          error.UserNotFound
+        _ -> error.BadRequest
+      }
+    })
 
   assert [id] = result.rows
   Ok(id)

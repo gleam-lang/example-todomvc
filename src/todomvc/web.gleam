@@ -108,7 +108,7 @@ pub fn error_to_response(error: AppError) -> Response(StringBuilder) {
     error.NotFound | error.UserNotFound -> not_found()
     error.MethodNotAllowed -> method_not_allowed()
     error.BadRequest -> bad_request()
-    error.UnprocessableEntity -> unprocessable_entity()
+    error.UnprocessableEntity | error.ContentRequired -> unprocessable_entity()
   }
 }
 
