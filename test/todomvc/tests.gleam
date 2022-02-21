@@ -4,11 +4,10 @@ import gleam/result
 import gleam/erlang/os
 
 pub fn with_db(f: fn(pgo.Connection) -> a) -> a {
-  let host = result.unwrap(os.get_env("PGHOST"), "localhost")
   let config =
     pgo.Config(
       ..pgo.default_config(),
-      host: host,
+      host: "localhost",
       database: "gleam_todomvc_test",
       user: "postgres",
       password: option.Some("postgres"),
