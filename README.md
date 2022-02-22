@@ -26,6 +26,7 @@ password `postgres`.
 
 ```sh
 bin/reset_dev_database.sh
+
 gleam run   # Run the web app
 gleam test  # Run the tests
 ```
