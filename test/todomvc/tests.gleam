@@ -2,6 +2,35 @@ import gleam/pgo
 import gleam/option
 import gleam/result
 import gleam/erlang/os
+import gleam/string_builder
+import gleam/http
+import gleam/http/response.{Response}
+import todomvc/web
+import todomvc/error.{AppError}
+import todomvc/web/routes
+
+pub fn request(
+  method method: http.Method,
+  path path: List(String),
+  body body: String,
+  user_id user_id: Int,
+  db db: pgo.Connection,
+) -> Result(Response(String), AppError) {
+  try response =
+    web.AppRequest(
+      method: method,
+      path: path,
+      body: body,
+      headers: [],
+      user_id: user_id,
+      db: db,
+    )
+    |> routes.router
+
+  response
+  |> response.map(string_builder.to_string)
+  |> Ok
+}
 
 pub fn with_db(f: fn(pgo.Connection) -> a) -> a {
   let config =
