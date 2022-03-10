@@ -7,7 +7,6 @@ import gleam/http/response.{Response}
 import gleam/http/request.{Request}
 import gleam/uri
 import gleam/string_builder.{StringBuilder}
-import gleam/bit_string
 import gleam/option.{Option}
 import gleam/string
 import gleam/result

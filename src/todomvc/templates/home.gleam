@@ -4,7 +4,6 @@ import gleam/list
 import todomvc/templates/item as item_template
 import todomvc/item.{Category, Counts, Item}
 import todomvc/web
-import gleam/result
 import gleam/list
 import gleam/int
 

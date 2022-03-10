@@ -1,7 +1,5 @@
 import gleam/pgo
 import gleam/option
-import gleam/result
-import gleam/erlang/os
 import gleam/string_builder
 import gleam/http
 import gleam/http/response.{Response}

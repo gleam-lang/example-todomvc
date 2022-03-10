@@ -1,9 +1,7 @@
 import gleam/bit_builder.{BitBuilder}
 import gleam/http/service.{Service}
 import gleam/http/request.{Request}
-import gleam/http/response
 import gleam/http
-import gleam/uri
 import gleam/list
 import gleam/string
 import gleam/result
@@ -23,7 +21,6 @@ import todomvc/item.{Category}
 import todomvc/web
 import todomvc/web/static
 import todomvc/web/log_requests
-import gleam/io
 
 pub fn router(request: web.AppRequest) -> web.AppResult {
   case request.path {

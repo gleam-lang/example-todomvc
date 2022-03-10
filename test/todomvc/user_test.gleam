@@ -1,5 +1,3 @@
-import gleam/io
-import gleam/pgo
 import todomvc/user
 import todomvc/tests
 

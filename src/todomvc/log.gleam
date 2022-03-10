@@ -1,6 +1,4 @@
-import gleam/io
 import gleam/dynamic.{Dynamic}
-import gleam/string
 
 pub type Level {
   Emergency

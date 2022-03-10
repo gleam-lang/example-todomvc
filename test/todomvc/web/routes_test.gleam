@@ -1,4 +1,3 @@
-import gleam/int
 import gleam/string
 import gleam/http
 import todomvc/item

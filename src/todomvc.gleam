@@ -1,15 +1,12 @@
 import todomvc/web/routes
 import todomvc/log
-import gleam/io
 import gleam/int
 import gleam/string
 import gleam/result
-import gleam/erlang
 import gleam/erlang/os
 import gleam/http/elli
 import gleam/option
 import gleam/pgo
-import gleam/io
 
 pub fn main() {
   log.configure_backend()
