@@ -80,13 +80,13 @@
         </span>
         <ul class="filters">
           <li>
-            <a hx-boost="true" class="{% if web.are_equal(category,item.All) %}selected{% endif %}" href="/">All</a>
+            <a hx-boost="true" class="{% if category == item.All %}selected{% endif %}" href="/">All</a>
           </li>
           <li>
-            <a hx-boost="true" class="{% if web.are_equal(category,item.Active) %}selected{% endif %}" href="/active">Active</a>
+            <a hx-boost="true" class="{% if category == item.Active %}selected{% endif %}" href="/active">Active</a>
           </li>
           <li>
-            <a hx-boost="true" class="{% if web.are_equal(category,item.Completed) %}selected{% endif %}" href="/completed">Completed</a>
+            <a hx-boost="true" class="{% if category == item.Completed %}selected{% endif %}" href="/completed">Completed</a>
           </li>
         </ul>
 
