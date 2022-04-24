@@ -33,12 +33,12 @@ gleam test  # Run the tests
 
 ## HTML templates
 
-The HTML templates are compiled using [gleam-templates](https://github.com/michaeljones/gleam-templates).
+The HTML templates are compiled using [matcha](https://github.com/michaeljones/matcha).
 
 To regenerate the Gleam code from the templates run:
 
 ```shell
-templates && gleam format .
+matcha && gleam format .
 ```
 
 ## Thanks
