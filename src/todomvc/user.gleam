@@ -23,6 +23,7 @@ returning
       with: [],
       expecting: dynamic.element(0, dynamic.int),
     )
+
   assert pgo.Returned(rows: [id], ..) = result
   id
 }

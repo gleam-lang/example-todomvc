@@ -26,6 +26,8 @@ pub fn start_database_connection_pool() -> pgo.Connection {
   let config =
     os.get_env("DATABASE_URL")
     |> result.then(pgo.url_config)
+    // In production we use IPv6
+    |> result.map(fn(config) { pgo.Config(..config, ip_version: pgo.Ipv6) })
     |> result.lazy_unwrap(fn() {
       pgo.Config(
         ..pgo.default_config(),
