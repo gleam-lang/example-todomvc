@@ -1,3 +1,5 @@
+import gleam/pgo
+
 pub type AppError {
   NotFound
   MethodNotAllowed
@@ -5,4 +7,5 @@ pub type AppError {
   BadRequest
   UnprocessableEntity
   ContentRequired
+  PgoError(pgo.QueryError)
 }

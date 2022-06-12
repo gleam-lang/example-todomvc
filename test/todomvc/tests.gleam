@@ -4,6 +4,7 @@ import gleam/string_builder
 import gleam/http
 import gleam/http/response.{Response}
 import todomvc/web
+import todomvc/database
 import todomvc/error.{AppError}
 import todomvc/web/routes
 
@@ -41,6 +42,7 @@ pub fn with_db(f: fn(pgo.Connection) -> a) -> a {
       pool_size: 1,
     )
   let db = pgo.connect(config)
+  assert Ok(_) = database.migrate_schema(db)
 
   ensure(run: fn() { f(db) }, afterwards: fn() { pgo.disconnect(db) })
 }

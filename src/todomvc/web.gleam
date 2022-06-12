@@ -108,6 +108,7 @@ pub fn error_to_response(error: AppError) -> Response(StringBuilder) {
     error.MethodNotAllowed -> method_not_allowed()
     error.BadRequest -> bad_request()
     error.UnprocessableEntity | error.ContentRequired -> unprocessable_entity()
+    error.PgoError(_) -> internal_server_error()
   }
 }
 
@@ -143,6 +144,12 @@ pub fn method_not_allowed() -> Response(StringBuilder) {
 pub fn bad_request() -> Response(StringBuilder) {
   let body = string_builder.from_string("Bad request")
   response.new(400)
+  |> response.set_body(body)
+}
+
+pub fn internal_server_error() -> Response(StringBuilder) {
+  let body = string_builder.from_string("Internal server error. Sorry!")
+  response.new(500)
   |> response.set_body(body)
 }
 
