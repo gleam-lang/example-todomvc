@@ -5,9 +5,11 @@ import gleam/int
 import gleam/string
 import gleam/result
 import gleam/erlang/os
-import gleam/http/elli
+import gleam/erlang
 import gleam/option
 import gleam/pgo
+import mist
+import mist/http
 
 pub fn main() {
   log.configure_backend()
@@ -21,7 +23,8 @@ pub fn main() {
   string.concat(["Listening on localhost:", int.to_string(port), " ✨"])
   |> log.info
 
-  assert Ok(_) = elli.become(web, on_port: port)
+  assert Ok(_) = mist.serve(port, http.handler(web))
+  erlang.sleep_forever()
 }
 
 pub fn start_database_connection_pool() -> pgo.Connection {

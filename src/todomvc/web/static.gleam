@@ -16,8 +16,13 @@ pub fn middleware(service: Service(in, BitBuilder)) -> Service(in, BitBuilder) {
       |> result.nil_error
       |> result.map(bit_builder.from_bit_string)
 
+    let content_type = case string.ends_with(request.path, ".css") {
+      True -> "text/css"
+      False -> "text/plain"
+    }
+
     case file_contents {
-      Ok(bits) -> Response(200, [], bits)
+      Ok(bits) -> Response(200, [#("content-type", content_type)], bits)
       Error(_) -> service(request)
     }
   }
