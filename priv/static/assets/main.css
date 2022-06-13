@@ -565,8 +565,3 @@ form.todo-mark button {
 .todo-list li .edit-btn:hover {
   color: #af5b5e;
 }
-
-.htmx-request {
-  opacity: 0.3 !important;
-  transition: opacity 0.3s ease-in-out !important;
-}

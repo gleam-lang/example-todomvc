@@ -61,7 +61,7 @@ pub fn render_builder(
     <section class=\"todoapp\">
       <header class=\"header\">
         <h1>todos</h1>
-        <form id=\"todo-form\" hx-post=\"/todos\" hx-indicator=\"#todo-form\">
+        <form id=\"todo-form\" hx-post=\"/todos\">
           <input
             autofocus
             required

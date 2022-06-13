@@ -83,9 +83,6 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
   let builder = string_builder.append(builder, "\"
       hx-target=\"#item-")
   let builder = string_builder.append(builder, int.to_string(item.id))
-  let builder = string_builder.append(builder, "\"
-      hx-indicator=\"#item-")
-  let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(
       builder,
@@ -101,9 +98,6 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
   let builder =
     string_builder.append(builder, "/completion\"
       hx-target=\"#item-")
-  let builder = string_builder.append(builder, int.to_string(item.id))
-  let builder = string_builder.append(builder, "\"
-      hx-indicator=\"#item-")
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(
