@@ -377,7 +377,7 @@ body {
 }
 
 .todo-list li .destroy:hover {
-        display: block;
+  display: block;
 	color: #af5b5e;
 	cursor: pointer;
 }
@@ -537,10 +537,10 @@ form.todo-mark button {
 }
 
 #logo {
-    width: 26%
+  width: 26%
 }
 
-.todo-list li .edit-btn{
+.todo-list li .edit-btn {
   display: none;
   position: absolute;
   top: 0;
@@ -558,9 +558,15 @@ form.todo-mark button {
 }
 
 .todo-list li:hover .edit-btn {
-    display: block;
+  display: block;
+  cursor: pointer;
 }
 
 .todo-list li .edit-btn:hover {
-	color: #af5b5e;
+  color: #af5b5e;
+}
+
+.htmx-request {
+  opacity: 0.3 !important;
+  transition: opacity 0.3s ease-in-out !important;
 }

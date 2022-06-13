@@ -4,9 +4,6 @@
 
 {> import todomvc/templates/item as item_template
 {> import todomvc/item.{Item, Counts, Category}
-{> import todomvc/web
-{> import gleam/result
-{> import gleam/list
 {> import gleam/int
 
 <!DOCTYPE html>
@@ -53,7 +50,7 @@
     <section class="todoapp">
       <header class="header">
         <h1>todos</h1>
-        <form hx-post="/todos">
+        <form id="todo-form" hx-post="/todos" hx-indicator="#todo-form">
           <input
             autofocus
             required

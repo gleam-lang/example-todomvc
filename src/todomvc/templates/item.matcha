@@ -31,6 +31,7 @@
       class="destroy"
       hx-delete="/todos/{{ int.to_string(item.id) }}"
       hx-target="#item-{{ int.to_string(item.id) }}"
+      hx-indicator="#item-{{ int.to_string(item.id) }}"
     ></button>
     </form>
 
@@ -38,6 +39,7 @@
       class="todo-mark"
       hx-patch="/todos/{{ int.to_string(item.id) }}/completion"
       hx-target="#item-{{ int.to_string(item.id) }}"
+      hx-indicator="#item-{{ int.to_string(item.id) }}"
       hx-swap="outerHTML"
     >
       <button></button>

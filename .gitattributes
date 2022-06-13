@@ -1,2 +1,2 @@
-*.gleamx linguist-language=html
+*.matcha linguist-language=html
 src/todomvc/templates/**/*.gleam linguist-generated=true
