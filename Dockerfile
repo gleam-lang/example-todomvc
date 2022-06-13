@@ -1,4 +1,4 @@
-FROM ghcr.io/gleam-lang/gleam:v0.19.0-erlang-alpine
+FROM ghcr.io/gleam-lang/gleam:v0.22.0-rc1-erlang-alpine
 
 # Create a group and user to run as
 RUN addgroup -S todomvc && adduser -S todomvc -G todomvc
