@@ -8,11 +8,15 @@ import gleam/string
 
 pub fn middleware(service: Service(in, BitBuilder)) -> Service(in, BitBuilder) {
   fn(request: Request(in)) -> Response(BitBuilder) {
+    let path =
+      string.concat([
+        priv_directory(),
+        "/static/",
+        string.replace(in: request.path, each: "..", with: ""),
+      ])
+
     let file_contents =
-      request.path
-      |> string.replace("..", "")
-      |> string.append("/static/", _)
-      |> string.append(priv_directory(), _)
+      path
       |> file.read_bits
       |> result.nil_error
       |> result.map(bit_builder.from_bit_string)
