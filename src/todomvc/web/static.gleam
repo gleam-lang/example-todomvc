@@ -11,7 +11,8 @@ pub fn middleware(service: Service(in, BitBuilder)) -> Service(in, BitBuilder) {
     let file_contents =
       request.path
       |> string.replace("..", "")
-      |> string.append("priv/static/", _)
+      |> string.append("/static/", _)
+      |> string.append(priv_directory(), _)
       |> file.read_bits
       |> result.nil_error
       |> result.map(bit_builder.from_bit_string)
@@ -27,3 +28,6 @@ pub fn middleware(service: Service(in, BitBuilder)) -> Service(in, BitBuilder) {
     }
   }
 }
+
+external fn priv_directory() -> String =
+  "todomvc_ffi" "priv_directory"
