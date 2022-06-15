@@ -1,7 +1,6 @@
 FROM ghcr.io/gleam-lang/gleam:v0.22.0-rc1-erlang-alpine
 
 # Add project code
-WORKDIR /app
 COPY . /build/
 
 # Compile the Gleam application
@@ -15,5 +14,6 @@ RUN cd /build \
 
 # Run the application
 USER todomvc
+WORKDIR /app
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["run"]
