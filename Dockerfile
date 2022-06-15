@@ -1,15 +1,19 @@
 FROM ghcr.io/gleam-lang/gleam:v0.22.0-rc1-erlang-alpine
 
-# Create a group and user to run as
-RUN addgroup -S todomvc && adduser -S todomvc -G todomvc
-USER todomvc
-
 # Add project code
-WORKDIR /app/
-COPY . ./
+WORKDIR /app
+COPY . /build/
 
 # Compile the Gleam application
-RUN gleam build
+RUN cd /build \
+  && gleam export erlang-shipment \
+  && mv build/erlang-shipment/* /app \
+  && rm -r /build \
+  && addgroup -S todomvc \
+  && adduser -S todomvc -G todomvc \
+  && chown -R todomvc /app
 
 # Run the application
-CMD ["gleam", "run"]
+USER todomvc
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["run"]
