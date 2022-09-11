@@ -5,11 +5,10 @@ import gleam/int
 import gleam/string
 import gleam/result
 import gleam/erlang/os
-import gleam/erlang
+import gleam/erlang/process
 import gleam/option
 import gleam/pgo
 import mist
-import mist/http
 
 pub fn main() {
   log.configure_backend()
@@ -23,8 +22,8 @@ pub fn main() {
   string.concat(["Listening on localhost:", int.to_string(port), " ✨"])
   |> log.info
 
-  assert Ok(_) = mist.serve(port, http.handler(web))
-  erlang.sleep_forever()
+  assert Ok(_) = mist.run_service(port, web, max_body_limit: 4_000_000_000)
+  process.sleep_forever()
 }
 
 pub fn start_database_connection_pool() -> pgo.Connection {

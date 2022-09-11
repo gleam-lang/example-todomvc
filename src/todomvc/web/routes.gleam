@@ -15,9 +15,8 @@ import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_changed as item_changed_template
 import todomvc/templates/item_deleted as item_deleted_template
 import todomvc/templates/completed_cleared as completed_cleared_template
-import todomvc/item.{Item}
 import todomvc/error
-import todomvc/item.{Category}
+import todomvc/item.{Category, Item}
 import todomvc/web
 import todomvc/web/static
 import todomvc/web/log_requests
