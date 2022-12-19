@@ -17,12 +17,12 @@ pub fn main() {
   let application_secret = load_application_secret()
   let db = start_database_connection_pool()
   assert Ok(_) = database.migrate_schema(db)
-  let web = routes.stack(application_secret, db)
+  let handler = routes.app(_, application_secret, db)
 
   string.concat(["Listening on localhost:", int.to_string(port), " ✨"])
   |> log.info
 
-  assert Ok(_) = mist.run_service(port, web, max_body_limit: 4_000_000_000)
+  assert Ok(_) = mist.run_service(port, handler, max_body_limit: 4_000_000_000)
   process.sleep_forever()
 }
 
@@ -53,5 +53,5 @@ fn load_application_secret() -> String {
 fn load_port() -> Int {
   os.get_env("PORT")
   |> result.then(int.parse)
-  |> result.unwrap(3000)
+  |> result.unwrap(3_000)
 }

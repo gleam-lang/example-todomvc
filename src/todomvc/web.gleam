@@ -35,39 +35,37 @@ pub type AppRequest {
 /// The `uid` cookie is signed to prevent tampering.
 ///
 pub fn authenticate(
-  service: fn(AppRequest) -> AppResult,
+  request: Request(String),
   secret: String,
   db: pgo.Connection,
-) -> fn(Request(String)) -> AppResult {
-  fn(request: Request(String)) {
-    try id = user_id_from_cookies(request, secret)
+  next: fn(AppRequest) -> Response(StringBuilder),
+) -> Response(StringBuilder) {
+  use id <- user_id_from_cookies(request, secret)
 
-    let #(id, new_user) = case id {
-      option.None -> {
-        log.info("Creating a new user")
-        #(user.insert_user(db), True)
-      }
-      option.Some(id) -> #(id, False)
+  let #(id, new_user) = case id {
+    option.None -> {
+      log.info("Creating a new user")
+      #(user.insert_user(db), True)
     }
+    option.Some(id) -> #(id, False)
+  }
 
-    try response =
-      service(AppRequest(
-        method: request.method,
-        path: request.path_segments(request),
-        headers: request.headers,
-        body: request.body,
-        db: db,
-        user_id: id,
-      ))
+  let response =
+    next(AppRequest(
+      method: request.method,
+      path: request.path_segments(request),
+      headers: request.headers,
+      body: request.body,
+      db: db,
+      user_id: id,
+    ))
 
-    case new_user {
-      True ->
-        <<int.to_string(id):utf8>>
-        |> crypto.sign_message(<<secret:utf8>>, crypto.Sha256)
-        |> response.set_cookie(response, "uid", _, cookie.defaults(Http))
-        |> Ok
-      False -> Ok(response)
-    }
+  case new_user {
+    True ->
+      <<int.to_string(id):utf8>>
+      |> crypto.sign_message(<<secret:utf8>>, crypto.Sha256)
+      |> response.set_cookie(response, "uid", _, cookie.defaults(Http))
+    False -> response
   }
 }
 
@@ -78,15 +76,17 @@ pub fn authenticate(
 /// then an error is returned.
 ///
 pub fn user_id_from_cookies(
-  request: Request(t),
+  request: Request(a),
   secret: String,
-) -> Result(Option(Int), AppError) {
+  next: fn(Option(Int)) -> Response(StringBuilder),
+) -> Response(StringBuilder) {
   case list.key_find(request.get_cookies(request), "uid") {
-    Ok(id) -> {
-      let id = user.verify_cookie_id(id, secret)
-      result.map(id, option.Some)
-    }
-    Error(_) -> Ok(option.None)
+    Ok(id) ->
+      case user.verify_cookie_id(id, secret) {
+        Ok(id) -> next(option.Some(id))
+        Error(_) -> bad_request()
+      }
+    Error(_) -> next(option.None)
   }
 }
 

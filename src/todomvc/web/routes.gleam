@@ -1,11 +1,10 @@
 import gleam/bit_builder.{BitBuilder}
-import gleam/http/service.{Service}
 import gleam/http/request.{Request}
+import gleam/http/response.{Response}
 import gleam/http
 import gleam/list
 import gleam/string
 import gleam/result
-import gleam/function
 import gleam/bit_string
 import gleam/string_builder.{StringBuilder}
 import gleam/pgo
@@ -33,29 +32,31 @@ pub fn router(request: web.AppRequest) -> web.AppResult {
   }
 }
 
-pub fn stack(
+pub fn app(
+  request: Request(BitString),
   secret: String,
   db: pgo.Connection,
-) -> Service(BitString, BitBuilder) {
-  router
-  |> web.authenticate(secret, db)
-  |> function.compose(web.result_to_response)
-  |> string_body_middleware
-  |> service.map_response_body(bit_builder.from_string_builder)
-  |> log_requests.middleware
-  |> static.middleware()
-  |> service.prepend_response_header("made-with", "Gleam")
+) -> Response(BitBuilder) {
+  use <- static.middleware(request)
+  use <- log_requests.middleware(request)
+  use request <- convert_string_body(request)
+  use request <- web.authenticate(request, secret, db)
+  router(request)
+  |> web.result_to_response
 }
 
-pub fn string_body_middleware(
-  service: Service(String, StringBuilder),
-) -> Service(BitString, StringBuilder) {
-  fn(request: Request(BitString)) {
-    case bit_string.to_string(request.body) {
-      Ok(body) -> service(request.set_body(request, body))
-      Error(_) -> web.bad_request()
-    }
+pub fn convert_string_body(
+  request: Request(BitString),
+  next: fn(Request(String)) -> Response(StringBuilder),
+) -> Response(BitBuilder) {
+  case bit_string.to_string(request.body) {
+    Ok(body) ->
+      request
+      |> request.set_body(body)
+      |> next
+    Error(_) -> web.bad_request()
   }
+  |> response.map(bit_builder.from_string_builder)
 }
 
 fn home(request: web.AppRequest, category: Category) -> web.AppResult {

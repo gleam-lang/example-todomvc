@@ -1,7 +1,6 @@
 import gleam/http
 import gleam/http/request.{Request}
 import gleam/http/response.{Response}
-import gleam/http/service.{Service}
 import gleam/int
 import gleam/string
 import todomvc/log
@@ -11,8 +10,8 @@ fn format_log_line(
   response: Response(b),
   elapsed: Int,
 ) -> String {
-  let elapsed = case elapsed > 1000 {
-    True -> string.append(int.to_string(elapsed / 1000), "ms")
+  let elapsed = case elapsed > 1_000 {
+    True -> string.append(int.to_string(elapsed / 1_000), "ms")
     False -> string.append(int.to_string(elapsed), "µs")
   }
 
@@ -29,14 +28,12 @@ fn format_log_line(
   ])
 }
 
-pub fn middleware(service: Service(a, b)) -> Service(a, b) {
-  fn(request) {
-    let before = now()
-    let response = service(request)
-    let elapsed = convert_time_unit(now() - before, Native, Microsecond)
-    log.info(format_log_line(request, response, elapsed))
-    response
-  }
+pub fn middleware(request: Request(_), next: fn() -> Response(a)) -> Response(a) {
+  let before = now()
+  let response = next()
+  let elapsed = convert_time_unit(now() - before, Native, Microsecond)
+  log.info(format_log_line(request, response, elapsed))
+  response
 }
 
 type TimeUnit {
