@@ -11,20 +11,32 @@ pub fn render_builder(
   display display: Bool,
 ) -> StringBuilder {
   let builder = string_builder.from_string("")
-  let builder = string_builder.append(builder, "
+  let builder =
+    string_builder.append(
+      builder,
+      "
 
-")
+",
+    )
   let builder = case display {
     True -> {
-      let builder = string_builder.append(builder, "
-")
+      let builder =
+        string_builder.append(
+          builder,
+          "
+",
+        )
       let builder =
         string_builder.append_builder(
           builder,
           item_template.render_builder(item, False),
         )
-      let builder = string_builder.append(builder, "
-")
+      let builder =
+        string_builder.append(
+          builder,
+          "
+",
+        )
       builder
     }
     False -> builder
@@ -39,12 +51,20 @@ pub fn render_builder(
     )
   let builder = case item.any_completed(counts) {
     True -> {
-      let builder = string_builder.append(builder, "
-  Clear Completed (")
+      let builder =
+        string_builder.append(
+          builder,
+          "
+  Clear Completed (",
+        )
       let builder =
         string_builder.append(builder, int.to_string(counts.completed))
-      let builder = string_builder.append(builder, ")
-  ")
+      let builder =
+        string_builder.append(
+          builder,
+          ")
+  ",
+        )
       builder
     }
     False -> builder
@@ -59,9 +79,13 @@ pub fn render_builder(
   <strong>",
     )
   let builder = string_builder.append(builder, int.to_string(counts.active))
-  let builder = string_builder.append(builder, "</strong> todos left
+  let builder =
+    string_builder.append(
+      builder,
+      "</strong> todos left
 </span>
-")
+",
+    )
 
   builder
 }

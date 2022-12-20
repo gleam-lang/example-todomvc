@@ -83,15 +83,23 @@ pub fn render_builder(
       items,
       builder,
       fn(builder, item: Item) {
-        let builder = string_builder.append(builder, "
-          ")
+        let builder =
+          string_builder.append(
+            builder,
+            "
+          ",
+          )
         let builder =
           string_builder.append_builder(
             builder,
             item_template.render_builder(item, False),
           )
-        let builder = string_builder.append(builder, "
-          ")
+        let builder =
+          string_builder.append(
+            builder,
+            "
+          ",
+          )
 
         builder
       },
@@ -171,12 +179,19 @@ pub fn render_builder(
   let builder = case item.any_completed(counts) {
     True -> {
       let builder =
-        string_builder.append(builder, "
-          Clear Completed (")
+        string_builder.append(
+          builder,
+          "
+          Clear Completed (",
+        )
       let builder =
         string_builder.append(builder, int.to_string(counts.completed))
-      let builder = string_builder.append(builder, ")
+      let builder =
+        string_builder.append(
+          builder,
           ")
+          ",
+        )
       builder
     }
     False -> builder

@@ -202,7 +202,8 @@ order by
 /// Delete a specific item belonging to a user.
 ///
 pub fn delete_item(item_id: Int, user_id: Int, db: pgo.Connection) -> Bool {
-  let sql = "
+  let sql =
+    "
 delete from
   items
 where
@@ -259,7 +260,8 @@ returning
 /// Delete a specific item belonging to a user.
 ///
 pub fn delete_completed(user_id: Int, db: pgo.Connection) -> Int {
-  let sql = "
+  let sql =
+    "
 delete from
   items
 where

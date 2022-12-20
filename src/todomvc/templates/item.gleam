@@ -7,13 +7,21 @@ import gleam/int
 
 pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
   let builder = string_builder.from_string("")
-  let builder = string_builder.append(builder, "
+  let builder =
+    string_builder.append(
+      builder,
+      "
 
 <li 
-  id=\"item-")
+  id=\"item-",
+    )
   let builder = string_builder.append(builder, int.to_string(item.id))
-  let builder = string_builder.append(builder, "\"
-  class=\"")
+  let builder =
+    string_builder.append(
+      builder,
+      "\"
+  class=\"",
+    )
   let builder = case item.completed {
     True -> {
       let builder = string_builder.append(builder, "completed")
@@ -48,11 +56,15 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
     }
     False -> builder
   }
-  let builder = string_builder.append(builder, "
+  let builder =
+    string_builder.append(
+      builder,
+      "
     >
 
     <label>
-      ")
+      ",
+    )
   let builder = string_builder.append(builder, web.escape(item.content))
   let builder =
     string_builder.append(
@@ -65,8 +77,12 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
       hx-get=\"/todos/",
     )
   let builder = string_builder.append(builder, int.to_string(item.id))
-  let builder = string_builder.append(builder, "\"
-      hx-target=\"#item-")
+  let builder =
+    string_builder.append(
+      builder,
+      "\"
+      hx-target=\"#item-",
+    )
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(
@@ -79,8 +95,12 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
       hx-delete=\"/todos/",
     )
   let builder = string_builder.append(builder, int.to_string(item.id))
-  let builder = string_builder.append(builder, "\"
-      hx-target=\"#item-")
+  let builder =
+    string_builder.append(
+      builder,
+      "\"
+      hx-target=\"#item-",
+    )
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(
@@ -95,8 +115,11 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
     )
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
-    string_builder.append(builder, "/completion\"
-      hx-target=\"#item-")
+    string_builder.append(
+      builder,
+      "/completion\"
+      hx-target=\"#item-",
+    )
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(
@@ -137,11 +160,19 @@ pub fn render_builder(item item: Item, editing editing: Bool) -> StringBuilder {
     value=\"",
     )
   let builder = string_builder.append(builder, web.escape(item.content))
-  let builder = string_builder.append(builder, "\"
-    hx-patch=\"/todos/")
+  let builder =
+    string_builder.append(
+      builder,
+      "\"
+    hx-patch=\"/todos/",
+    )
   let builder = string_builder.append(builder, int.to_string(item.id))
-  let builder = string_builder.append(builder, "\"
-    hx-target=\"#item-")
+  let builder =
+    string_builder.append(
+      builder,
+      "\"
+    hx-target=\"#item-",
+    )
   let builder = string_builder.append(builder, int.to_string(item.id))
   let builder =
     string_builder.append(

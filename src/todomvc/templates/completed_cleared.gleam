@@ -24,15 +24,23 @@ pub fn render_builder(
       items,
       builder,
       fn(builder, item: Item) {
-        let builder = string_builder.append(builder, "
-  ")
+        let builder =
+          string_builder.append(
+            builder,
+            "
+  ",
+          )
         let builder =
           string_builder.append_builder(
             builder,
             item_template.render_builder(item, False),
           )
-        let builder = string_builder.append(builder, "
-  ")
+        let builder =
+          string_builder.append(
+            builder,
+            "
+  ",
+          )
 
         builder
       },
@@ -47,9 +55,13 @@ pub fn render_builder(
   <strong>",
     )
   let builder = string_builder.append(builder, int.to_string(counts.active))
-  let builder = string_builder.append(builder, "</strong> todos left
+  let builder =
+    string_builder.append(
+      builder,
+      "</strong> todos left
 </span>
-")
+",
+    )
 
   builder
 }

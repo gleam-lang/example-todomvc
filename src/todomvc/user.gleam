@@ -10,7 +10,8 @@ import todomvc/log
 /// Insert a new user, returning their id.
 ///
 pub fn insert_user(db: pgo.Connection) -> Int {
-  let sql = "
+  let sql =
+    "
 insert into users 
 default values
 returning

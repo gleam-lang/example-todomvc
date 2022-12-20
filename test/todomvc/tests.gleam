@@ -48,7 +48,8 @@ pub fn with_db(f: fn(pgo.Connection) -> a) -> a {
 }
 
 pub fn truncate_db(db: pgo.Connection) -> Nil {
-  let sql = "
+  let sql =
+    "
 truncate
   users,
   items
