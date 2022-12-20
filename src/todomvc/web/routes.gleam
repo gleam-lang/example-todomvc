@@ -14,13 +14,12 @@ import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_changed as item_changed_template
 import todomvc/templates/item_deleted as item_deleted_template
 import todomvc/templates/completed_cleared as completed_cleared_template
-import todomvc/error
 import todomvc/item.{Category, Item}
 import todomvc/web
 import todomvc/web/static
 import todomvc/web/log_requests
 
-pub fn router(request: web.AppRequest) -> web.AppResult {
+pub fn router(request: web.AppRequest) -> Response(StringBuilder) {
   case request.path {
     [] -> home(request, item.All)
     ["active"] -> home(request, item.Active)
@@ -28,7 +27,7 @@ pub fn router(request: web.AppRequest) -> web.AppResult {
     ["todos"] -> todos(request)
     ["todos", id] -> todo_item(request, id)
     ["todos", id, "completion"] -> item_completion(request, id)
-    _ -> Error(error.NotFound)
+    _ -> web.not_found()
   }
 }
 
@@ -42,7 +41,6 @@ pub fn app(
   use request <- convert_string_body(request)
   use request <- web.authenticate(request, secret, db)
   router(request)
-  |> web.result_to_response
 }
 
 pub fn convert_string_body(
@@ -59,7 +57,7 @@ pub fn convert_string_body(
   |> response.map(bit_builder.from_string_builder)
 }
 
-fn home(request: web.AppRequest, category: Category) -> web.AppResult {
+fn home(request: web.AppRequest, category: Category) -> Response(StringBuilder) {
   let items = case category {
     item.All -> item.list_items(request.user_id, request.db)
     item.Active -> item.filtered_items(request.user_id, False, request.db)
@@ -69,18 +67,17 @@ fn home(request: web.AppRequest, category: Category) -> web.AppResult {
 
   home_template.render_builder(items, counts, category)
   |> web.html_response(200)
-  |> Ok
 }
 
-fn completed(request: web.AppRequest) -> web.AppResult {
+fn completed(request: web.AppRequest) -> Response(StringBuilder) {
   case request.method {
     http.Get -> home(request, item.Completed)
     http.Delete -> delete_completed(request)
-    _ -> Error(error.MethodNotAllowed)
+    _ -> web.method_not_allowed()
   }
 }
 
-fn delete_completed(request: web.AppRequest) -> web.AppResult {
+fn delete_completed(request: web.AppRequest) -> Response(StringBuilder) {
   item.delete_completed(request.user_id, request.db)
   let counts = item.get_counts(request.user_id, request.db)
   let items = case current_category(request) {
@@ -90,76 +87,78 @@ fn delete_completed(request: web.AppRequest) -> web.AppResult {
 
   completed_cleared_template.render_builder(items, counts)
   |> web.html_response(201)
-  |> Ok
 }
 
-fn todos(request: web.AppRequest) -> web.AppResult {
+fn todos(request: web.AppRequest) -> Response(StringBuilder) {
   case request.method {
     http.Post -> create_todo(request)
-    _ -> Error(error.MethodNotAllowed)
+    _ -> web.method_not_allowed()
   }
 }
 
-fn create_todo(request: web.AppRequest) -> web.AppResult {
-  try params = web.parse_urlencoded_body(request)
-  try content = web.key_find(params, "content")
-  try id = item.insert_item(content, request.user_id, request.db)
+fn create_todo(request: web.AppRequest) -> Response(StringBuilder) {
+  use params <- web.try_(web.parse_urlencoded_body(request))
+  use content <- web.try_(web.key_find(params, "content"))
+  use id <- web.try_(item.insert_item(content, request.user_id, request.db))
   let item = Item(id: id, completed: False, content: content)
   let counts = item.get_counts(request.user_id, request.db)
   let display = item.is_member(item, current_category(request))
 
   item_created_template.render_builder(item, counts, display)
   |> web.html_response(201)
-  |> Ok
 }
 
-fn todo_item(request: web.AppRequest, id: String) -> web.AppResult {
+fn todo_item(request: web.AppRequest, id: String) -> Response(StringBuilder) {
   case request.method {
     http.Get -> get_todo_edit_form(request, id)
     http.Delete -> delete_item(request, id)
     http.Patch -> update_todo(request, id)
-    _ -> Error(error.MethodNotAllowed)
+    _ -> web.method_not_allowed()
   }
 }
 
-fn get_todo_edit_form(request: web.AppRequest, id: String) -> web.AppResult {
-  try id = web.parse_int(id)
-  try item = item.get_item(id, request.user_id, request.db)
+fn get_todo_edit_form(
+  request: web.AppRequest,
+  id: String,
+) -> Response(StringBuilder) {
+  use id <- web.try_(web.parse_int(id))
+  use item <- web.try_(item.get_item(id, request.user_id, request.db))
   item_template.render_builder(item, True)
   |> web.html_response(200)
-  |> Ok
 }
 
-fn update_todo(request: web.AppRequest, id: String) -> web.AppResult {
-  try id = web.parse_int(id)
-  try params = web.parse_urlencoded_body(request)
-  try content = web.key_find(params, "content")
-  try item = item.update_item(id, request.user_id, content, request.db)
+fn update_todo(request: web.AppRequest, id: String) -> Response(StringBuilder) {
+  use id <- web.try_(web.parse_int(id))
+  use params <- web.try_(web.parse_urlencoded_body(request))
+  use content <- web.try_(web.key_find(params, "content"))
+  use
+    item
+  <- web.try_(item.update_item(id, request.user_id, content, request.db))
 
   item_template.render_builder(item, False)
   |> web.html_response(200)
-  |> Ok
 }
 
-fn delete_item(request: web.AppRequest, id: String) -> web.AppResult {
-  try id = web.parse_int(id)
+fn delete_item(request: web.AppRequest, id: String) -> Response(StringBuilder) {
+  use id <- web.try_(web.parse_int(id))
   item.delete_item(id, request.user_id, request.db)
 
   item.get_counts(request.user_id, request.db)
   |> item_deleted_template.render_builder
   |> web.html_response(200)
-  |> Ok
 }
 
-fn item_completion(request: web.AppRequest, id: String) -> web.AppResult {
-  try id = web.parse_int(id)
-  try item = item.toggle_completion(id, request.user_id, request.db)
+fn item_completion(
+  request: web.AppRequest,
+  id: String,
+) -> Response(StringBuilder) {
+  use id <- web.try_(web.parse_int(id))
+  use item <- web.try_(item.toggle_completion(id, request.user_id, request.db))
   let counts = item.get_counts(request.user_id, request.db)
   let display = item.is_member(item, current_category(request))
 
   item_changed_template.render_builder(item, counts, display)
   |> web.html_response(200)
-  |> Ok
 }
 
 fn current_category(request: web.AppRequest) -> Category {

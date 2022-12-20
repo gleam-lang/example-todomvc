@@ -5,7 +5,6 @@ import gleam/http
 import gleam/http/response.{Response}
 import todomvc/web
 import todomvc/database
-import todomvc/error.{AppError}
 import todomvc/web/routes
 
 pub fn request(
@@ -14,8 +13,8 @@ pub fn request(
   body body: String,
   user_id user_id: Int,
   db db: pgo.Connection,
-) -> Result(Response(String), AppError) {
-  try response =
+) -> Response(String) {
+  let response =
     web.AppRequest(
       method: method,
       path: path,
@@ -28,7 +27,6 @@ pub fn request(
 
   response
   |> response.map(string_builder.to_string)
-  |> Ok
 }
 
 pub fn with_db(f: fn(pgo.Connection) -> a) -> a {

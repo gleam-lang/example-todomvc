@@ -14,7 +14,7 @@ pub fn home_test() {
   let uid2 = user.insert_user(db)
   assert Ok(_) = item.insert_item("Wabble", uid2, db)
 
-  assert Ok(response) =
+  let response =
     tests.request(http.Get, path: [], body: "", user_id: uid1, db: db)
 
   response.status

@@ -100,6 +100,16 @@ pub fn result_to_response(result: AppResult) -> Response(StringBuilder) {
   }
 }
 
+pub fn try_(
+  result: Result(t, AppError),
+  next: fn(t) -> Response(StringBuilder),
+) -> Response(StringBuilder) {
+  case result {
+    Ok(t) -> next(t)
+    Error(error) -> error_to_response(error)
+  }
+}
+
 /// Return an appropriate HTTP response for a given error.
 ///
 pub fn error_to_response(error: AppError) -> Response(StringBuilder) {
