@@ -19,7 +19,7 @@ pub fn main() {
   assert Ok(_) = database.migrate_schema(db)
   let handler = routes.app(_, application_secret, db)
 
-  string.concat(["Listening on localhost:", int.to_string(port), " ✨"])
+  string.concat(["Listening on http://localhost:", int.to_string(port), " ✨"])
   |> log.info
 
   assert Ok(_) = mist.run_service(port, handler, max_body_limit: 4_000_000_000)
