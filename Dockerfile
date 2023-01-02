@@ -4,10 +4,12 @@ FROM ghcr.io/gleam-lang/gleam:v0.25.3-erlang-alpine
 COPY . /build/
 
 # Compile the Gleam application
-RUN cd /build \
+RUN apk add gcc build-base \
+  && cd /build \
   && gleam export erlang-shipment \
-  && mv build/erlang-shipment/* /app \
+  && mv build/erlang-shipment /app \
   && rm -r /build \
+  && apk del gcc build-base \
   && addgroup -S todomvc \
   && adduser -S todomvc -G todomvc \
   && chown -R todomvc /app
