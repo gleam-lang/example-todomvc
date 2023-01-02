@@ -1,4 +1,4 @@
-import gleam/pgo
+import sqlight
 import gleam/int
 import gleam/result
 import gleam/crypto
@@ -9,23 +9,21 @@ import todomvc/log
 
 /// Insert a new user, returning their id.
 ///
-pub fn insert_user(db: pgo.Connection) -> Int {
+pub fn insert_user(db: sqlight.Connection) -> Int {
   let sql =
     "
-insert into users 
-default values
-returning
-  id
+insert into users
+default values 
+returning id;
 "
-  assert Ok(result) =
-    pgo.execute(
+  assert Ok([id]) =
+    sqlight.query(
       sql,
       on: db,
       with: [],
       expecting: dynamic.element(0, dynamic.int),
     )
 
-  assert pgo.Returned(rows: [id], ..) = result
   id
 }
 

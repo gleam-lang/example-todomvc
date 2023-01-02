@@ -12,11 +12,11 @@ import gleam/string
 import gleam/result
 import gleam/list
 import gleam/int
-import gleam/pgo
 import gleam/crypto
 import todomvc/error.{AppError}
 import todomvc/user
 import todomvc/log
+import todomvc/database
 
 pub type AppRequest {
   AppRequest(
@@ -24,7 +24,7 @@ pub type AppRequest {
     path: List(String),
     headers: List(#(String, String)),
     body: String,
-    db: pgo.Connection,
+    db: String,
     user_id: Int,
   )
 }
@@ -37,7 +37,7 @@ pub type AppRequest {
 pub fn authenticate(
   request: Request(String),
   secret: String,
-  db: pgo.Connection,
+  db_name: String,
   next: fn(AppRequest) -> Response(StringBuilder),
 ) -> Response(StringBuilder) {
   use id <- user_id_from_cookies(request, secret)
@@ -45,7 +45,15 @@ pub fn authenticate(
   let #(id, new_user) = case id {
     option.None -> {
       log.info("Creating a new user")
-      #(user.insert_user(db), True)
+      assert Ok(user) =
+        database.with_connection(
+          db_name,
+          fn(db) {
+            let id = user.insert_user(db)
+            Ok(id)
+          },
+        )
+      #(user, True)
     }
     option.Some(id) -> #(id, False)
   }
@@ -56,7 +64,7 @@ pub fn authenticate(
       path: request.path_segments(request),
       headers: request.headers,
       body: request.body,
-      db: db,
+      db: db_name,
       user_id: id,
     ))
 
@@ -119,7 +127,7 @@ pub fn error_to_response(error: AppError) -> Response(StringBuilder) {
     error.MethodNotAllowed -> method_not_allowed()
     error.BadRequest -> bad_request()
     error.UnprocessableEntity | error.ContentRequired -> unprocessable_entity()
-    error.PgoError(_) -> internal_server_error()
+    error.SqlightError(_) -> internal_server_error()
   }
 }
 

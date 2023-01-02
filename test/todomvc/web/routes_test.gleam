@@ -6,7 +6,8 @@ import todomvc/tests
 import gleeunit/should
 
 pub fn home_test() {
-  use db <- tests.with_db
+  let name = "file:routes.home_test?mode=memory&cache=shared"
+  use db <- tests.with_db(name)
 
   let uid1 = user.insert_user(db)
   assert Ok(_) = item.insert_item("Wibble", uid1, db)
@@ -15,7 +16,7 @@ pub fn home_test() {
   assert Ok(_) = item.insert_item("Wabble", uid2, db)
 
   let response =
-    tests.request(http.Get, path: [], body: "", user_id: uid1, db: db)
+    tests.request(http.Get, path: [], body: "", user_id: uid1, db: name)
 
   response.status
   |> should.equal(200)

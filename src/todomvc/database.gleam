@@ -1,64 +1,47 @@
 import todomvc/error.{AppError}
-import todomvc/log
-import gleam/dynamic
-import gleam/string
 import gleam/result
-import gleam/pgo
+import sqlight
+
+pub fn with_connection(name: String, f: fn(sqlight.Connection) -> a) -> a {
+  use db <- sqlight.with_connection(name)
+  assert Ok(_) = sqlight.exec("pragma foreign_keys = on;", db)
+  f(db)
+}
 
 /// Run some idempotent DDL to ensure we have the PostgreSQL database schema
 /// that we want. This should be run when the application starts.
-pub fn migrate_schema(db: pgo.Connection) -> Result(Nil, AppError) {
-  try _ =
-    exec(
-      db,
-      "create_table_users",
-      "create table if not exists users (
-        id serial primary key
-      )",
-    )
+pub fn migrate_schema(db: sqlight.Connection) -> Result(Nil, AppError) {
+  sqlight.exec(
+    "
+    create table if not exists users (
+      id integer primary key autoincrement not null
+    ) strict;
 
-  try _ =
-    exec(
-      db,
-      "create_table_items",
-      "create table if not exists items (
-      id serial
-        primary key,
+    create table if not exists items (
+     id integer primary key autoincrement not null,
 
-      inserted_at timestamp
-        default now(),
+     inserted_at text not null
+       default current_timestamp,
 
-      completed boolean 
-        not null
-        default false,
+     completed integer 
+       not null
+       default 0,
 
-      content varchar(500)
-        not null
-        check (content != ''),
+     content text
+       not null
+       constraint empty_content check (content != ''),
 
-      user_id integer
-        references users (id)
-    )",
-    )
+     user_id integer not null,
+     foreign key (user_id)
+       references users (id)
+    ) strict;
 
-  try _ =
-    exec(
-      db,
-      "create_index_items_user_id_completed",
-      "create index if not exists items_user_id_completed 
-      on items (
-        user_id, 
-        completed
-      )",
-    )
-
-  Ok(Nil)
-}
-
-fn exec(db: pgo.Connection, name: String, sql: String) -> Result(Nil, AppError) {
-  log.info(string.concat(["Running migration ", name]))
-  try _ =
-    pgo.execute(sql, on: db, with: [], expecting: dynamic.dynamic)
-    |> result.map_error(error.PgoError)
-  Ok(Nil)
+    create index if not exists items_user_id_completed 
+    on items (
+      user_id, 
+      completed
+    );",
+    db,
+  )
+  |> result.map_error(error.SqlightError)
 }

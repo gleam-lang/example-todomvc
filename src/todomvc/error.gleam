@@ -1,4 +1,4 @@
-import gleam/pgo
+import sqlight
 
 pub type AppError {
   NotFound
@@ -7,5 +7,5 @@ pub type AppError {
   BadRequest
   UnprocessableEntity
   ContentRequired
-  PgoError(pgo.QueryError)
+  SqlightError(sqlight.Error)
 }

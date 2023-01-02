@@ -5,7 +5,7 @@ import todomvc/error
 import gleeunit/should
 
 pub fn item_creation_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id = user.insert_user(db)
 
   // A user starts with no items
@@ -24,7 +24,7 @@ pub fn item_creation_test() {
 }
 
 pub fn item_creation_without_content_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id = user.insert_user(db)
 
   // Items cannot be added without content
@@ -36,14 +36,14 @@ pub fn item_creation_without_content_test() {
 }
 
 pub fn item_with_unknown_user_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   // Items cannot be added for an unknown user
   item.insert_item("One", -1, db)
   |> should.equal(Error(error.UserNotFound))
 }
 
 pub fn toggle_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id = user.insert_user(db)
 
   // Items can be added
@@ -56,7 +56,7 @@ pub fn toggle_test() {
 }
 
 pub fn toggle_unknown_id_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id = user.insert_user(db)
 
   item.toggle_completion(0, user_id, db)
@@ -64,7 +64,7 @@ pub fn toggle_unknown_id_test() {
 }
 
 pub fn toggle_user_mismatch_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id1 = user.insert_user(db)
   let user_id2 = user.insert_user(db)
 
@@ -76,7 +76,7 @@ pub fn toggle_user_mismatch_test() {
 }
 
 pub fn counts_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id1 = user.insert_user(db)
   let user_id2 = user.insert_user(db)
 
@@ -102,36 +102,33 @@ pub fn counts_test() {
 }
 
 pub fn delete_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id = user.insert_user(db)
   assert Ok(id) = item.insert_item("x", user_id, db)
 
   item.delete_item(id, user_id, db)
-  |> should.equal(True)
 
   item.list_items(user_id, db)
   |> should.equal([])
 
   item.delete_item(id, user_id, db)
-  |> should.equal(False)
 }
 
 pub fn delete_other_users_item_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id1 = user.insert_user(db)
   let user_id2 = user.insert_user(db)
   assert Ok(id) = item.insert_item("x", user_id1, db)
 
   // It belongs to someone else so it can't be deleted
   item.delete_item(id, user_id2, db)
-  |> should.equal(False)
 
   item.list_items(user_id1, db)
   |> should.equal([Item(id: id, completed: False, content: "x")])
 }
 
 pub fn delete_completed_test() {
-  use db <- tests.with_db
+  use db <- tests.with_db("")
   let user_id1 = user.insert_user(db)
   let user_id2 = user.insert_user(db)
 
@@ -150,7 +147,6 @@ pub fn delete_completed_test() {
 
   // Delete completed items for the first user
   item.delete_completed(user_id1, db)
-  |> should.equal(2)
 
   // Completed items for that user have been deleted
   item.list_items(user_id1, db)

@@ -2,27 +2,24 @@
 # You typically do not need to edit this file
 
 packages = [
-  { name = "backoff", version = "1.1.6", build_tools = ["rebar3"], requirements = [], otp_app = "backoff", source = "hex", outer_checksum = "CF0CFFF8995FB20562F822E5CC47D8CCF664C5ECDC26A684CBE85C225F9D7C39" },
+  { name = "esqlite", version = "0.8.5", build_tools = ["rebar3"], requirements = [], otp_app = "esqlite", source = "hex", outer_checksum = "75F0DCAB190A09842B1D9305765C026D8AA2ED7C98EFF272DFB529CAC99B0742" },
   { name = "gleam_bitwise", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_bitwise", source = "hex", outer_checksum = "6064699EFBABB1CA392DCB193D0E8B402FB042B4B46857B01E6875E643B57F54" },
   { name = "gleam_crypto", version = "0.3.0", build_tools = ["gleam"], requirements = ["gleam_bitwise", "gleam_stdlib"], otp_app = "gleam_crypto", source = "hex", outer_checksum = "223ED23E48DD712417370240628E79D0AF4821ADC53A4BB17E22F6BBF755C2E2" },
   { name = "gleam_erlang", version = "0.17.1", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_erlang", source = "hex", outer_checksum = "BAAA84F5BCC4477E809BA3E03BB3009A3894A6544C1511626C44408E39DB2AE6" },
   { name = "gleam_http", version = "3.1.1", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_http", source = "hex", outer_checksum = "B66B7A1539CCB577119E4DC80DD3484C1A652CB032967954498EEDBAE3355763" },
   { name = "gleam_otp", version = "0.5.2", build_tools = ["gleam"], requirements = ["gleam_stdlib", "gleam_erlang"], otp_app = "gleam_otp", source = "hex", outer_checksum = "24B88BF1D5B8DEC2525C00ECB65B96D2FD4DC66D8B2BB4D7AD4D12B2CE2A9988" },
-  { name = "gleam_pgo", version = "0.4.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "pgo"], otp_app = "gleam_pgo", source = "hex", outer_checksum = "4295BDB6F885436EEB4B1EAB78457CFE34695BD5B59E82DEEB2CEF6D528779DF" },
   { name = "gleam_stdlib", version = "0.25.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "AD0F89928E0B919C8F8EDF640484633B28DBF88630A9E6AE504617A3E3E5B9A2" },
   { name = "gleeunit", version = "0.8.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleeunit", source = "hex", outer_checksum = "A1170754BF54F5DD6E9EF392FB1DC612528B007CCBE41B52F0C5453254708490" },
-  { name = "glisten", version = "0.6.6", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_otp", "gleam_http", "gleam_stdlib"], otp_app = "glisten", source = "hex", outer_checksum = "A5B1E40EEA5941A369067E1BD3A1C52B00003BBCFC93975BD2FADEFE7FE82F27" },
-  { name = "mist", version = "0.9.4", build_tools = ["gleam"], requirements = ["glisten", "gleam_erlang", "gleam_otp", "gleam_http", "gleam_stdlib"], otp_app = "mist", source = "hex", outer_checksum = "D327F690A717F588281E636D99E014A90D8EBC2F2B479AA799A1D6AA3899A1B2" },
-  { name = "opentelemetry_api", version = "1.2.0", build_tools = ["rebar3", "mix"], requirements = [], otp_app = "opentelemetry_api", source = "hex", outer_checksum = "9E677C68243DE0F70538798072E66E1FB1D4A2CA8888A6EB493C0A41E5480C35" },
-  { name = "pg_types", version = "0.4.0", build_tools = ["rebar3"], requirements = [], otp_app = "pg_types", source = "hex", outer_checksum = "B02EFA785CAECECF9702C681C80A9CA12A39F9161A846CE17B01FB20AEEED7EB" },
-  { name = "pgo", version = "0.13.0", build_tools = ["rebar3"], requirements = ["opentelemetry_api", "backoff", "pg_types"], otp_app = "pgo", source = "hex", outer_checksum = "1B0ADAB78300D23FD49A0D03A987EC9531960FDB208F51C3E07AED9F5367523B" },
+  { name = "glisten", version = "0.6.6", build_tools = ["gleam"], requirements = ["gleam_otp", "gleam_erlang", "gleam_http", "gleam_stdlib"], otp_app = "glisten", source = "hex", outer_checksum = "A5B1E40EEA5941A369067E1BD3A1C52B00003BBCFC93975BD2FADEFE7FE82F27" },
+  { name = "mist", version = "0.9.4", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_http", "gleam_stdlib", "glisten", "gleam_otp"], otp_app = "mist", source = "hex", outer_checksum = "D327F690A717F588281E636D99E014A90D8EBC2F2B479AA799A1D6AA3899A1B2" },
+  { name = "sqlight", version = "0.4.0", build_tools = ["gleam"], requirements = ["esqlite", "gleam_stdlib"], otp_app = "sqlight", source = "hex", outer_checksum = "DB0F51E004ABD6459AA4BE9B0C072BBE295D08729C1DC443D3B76D4A3E55D3BF" },
 ]
 
 [requirements]
 gleam_crypto = "~> 0.3"
 gleam_erlang = "~> 0.9"
 gleam_http = "~> 3.0"
-gleam_pgo = "~> 0.4"
 gleam_stdlib = "~> 0.19"
 gleeunit = "~> 0.6"
 mist = "~> 0.4"
+sqlight = "~> 0.4"

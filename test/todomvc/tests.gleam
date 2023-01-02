@@ -1,10 +1,9 @@
-import gleam/pgo
-import gleam/option
+import sqlight
 import gleam/string_builder
 import gleam/http
 import gleam/http/response.{Response}
-import todomvc/web
 import todomvc/database
+import todomvc/web
 import todomvc/web/routes
 
 pub fn request(
@@ -12,7 +11,7 @@ pub fn request(
   path path: List(String),
   body body: String,
   user_id user_id: Int,
-  db db: pgo.Connection,
+  db db: String,
 ) -> Response(String) {
   let response =
     web.AppRequest(
@@ -29,23 +28,13 @@ pub fn request(
   |> response.map(string_builder.to_string)
 }
 
-pub fn with_db(f: fn(pgo.Connection) -> a) -> a {
-  let config =
-    pgo.Config(
-      ..pgo.default_config(),
-      host: "localhost",
-      database: "gleam_todomvc_test",
-      user: "postgres",
-      password: option.Some("postgres"),
-      pool_size: 1,
-    )
-  let db = pgo.connect(config)
+pub fn with_db(name: String, f: fn(sqlight.Connection) -> a) -> a {
+  use db <- database.with_connection(name)
   assert Ok(_) = database.migrate_schema(db)
-
-  ensure(run: fn() { f(db) }, afterwards: fn() { pgo.disconnect(db) })
+  f(db)
 }
 
-pub fn truncate_db(db: pgo.Connection) -> Nil {
+pub fn truncate_db(db: sqlight.Connection) -> Nil {
   let sql =
     "
 truncate
@@ -53,7 +42,7 @@ truncate
   items
 cascade
 "
-  assert Ok(_) = pgo.execute(sql, on: db, with: [], expecting: Ok)
+  assert Ok(_) = sqlight.query(sql, on: db, with: [], expecting: Ok)
   Nil
 }
 

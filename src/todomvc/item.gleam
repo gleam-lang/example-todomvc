@@ -1,4 +1,4 @@
-import gleam/pgo
+import sqlight
 import gleam/list
 import gleam/bool
 import gleam/result
@@ -25,14 +25,14 @@ pub fn item_row_decoder() -> dynamic.Decoder(Item) {
   dynamic.decode3(
     Item,
     dynamic.element(0, dynamic.int),
-    dynamic.element(1, dynamic.bool),
+    dynamic.element(1, sqlight.decode_bool),
     dynamic.element(2, dynamic.string),
   )
 }
 
 /// Count the number of completed and active items in the database for a user.
 ///
-pub fn get_counts(user_id: Int, db: pgo.Connection) -> Counts {
+pub fn get_counts(user_id: Int, db: sqlight.Connection) -> Counts {
   let sql =
     "
 select 
@@ -47,19 +47,19 @@ group by
 order by
   completed asc
 "
-  assert Ok(result) =
-    pgo.execute(
+  assert Ok(rows) =
+    sqlight.query(
       sql,
       on: db,
-      with: [pgo.int(user_id)],
-      expecting: dynamic.tuple2(dynamic.bool, dynamic.int),
+      with: [sqlight.int(user_id)],
+      expecting: dynamic.tuple2(sqlight.decode_bool, dynamic.int),
     )
   let completed =
-    result.rows
+    rows
     |> list.key_find(True)
     |> result.unwrap(0)
   let active =
-    result.rows
+    rows
     |> list.key_find(False)
     |> result.unwrap(0)
   Counts(active: active, completed: completed)
@@ -70,7 +70,7 @@ order by
 pub fn insert_item(
   content: String,
   user_id: Int,
-  db: pgo.Connection,
+  db: sqlight.Connection,
 ) -> Result(Int, AppError) {
   let sql =
     "
@@ -81,24 +81,23 @@ values
 returning
   id
 "
-  try result =
-    pgo.execute(
+  try rows =
+    sqlight.query(
       sql,
       on: db,
-      with: [pgo.text(content), pgo.int(user_id)],
+      with: [sqlight.text(content), sqlight.int(user_id)],
       expecting: dynamic.element(0, dynamic.int),
     )
     |> result.map_error(fn(error) {
-      case error {
-        pgo.ConstraintViolated(constraint: "items_content_check", ..) ->
+      case error.code, error.message {
+        sqlight.ConstraintCheck, "CHECK constraint failed: empty_content" ->
           error.ContentRequired
-        pgo.ConstraintViolated(constraint: "items_user_id_fkey", ..) ->
-          error.UserNotFound
-        _ -> error.BadRequest
+        sqlight.ConstraintForeignkey, _ -> error.UserNotFound
+        _, _ -> error.BadRequest
       }
     })
 
-  assert [id] = result.rows
+  assert [id] = rows
   Ok(id)
 }
 
@@ -107,7 +106,7 @@ returning
 pub fn get_item(
   item_id: Int,
   user_id: Int,
-  db: pgo.Connection,
+  db: sqlight.Connection,
 ) -> Result(Item, AppError) {
   let sql =
     "
@@ -123,15 +122,15 @@ and
   user_id = $2
 "
 
-  assert Ok(result) =
-    pgo.execute(
+  assert Ok(rows) =
+    sqlight.query(
       sql,
       on: db,
-      with: [pgo.int(item_id), pgo.int(user_id)],
+      with: [sqlight.int(item_id), sqlight.int(user_id)],
       expecting: item_row_decoder(),
     )
 
-  case result.rows {
+  case rows {
     [item] -> Ok(item)
     _ -> Error(error.NotFound)
   }
@@ -142,7 +141,7 @@ and
 pub fn filtered_items(
   user_id: Int,
   completed: Bool,
-  db: pgo.Connection,
+  db: sqlight.Connection,
 ) -> List(Item) {
   let sql =
     "
@@ -160,20 +159,20 @@ order by
   inserted_at asc
 "
 
-  assert Ok(result) =
-    pgo.execute(
+  assert Ok(rows) =
+    sqlight.query(
       sql,
       on: db,
-      with: [pgo.int(user_id), pgo.bool(completed)],
+      with: [sqlight.int(user_id), sqlight.bool(completed)],
       expecting: item_row_decoder(),
     )
 
-  result.rows
+  rows
 }
 
 /// List all the items for a user.
 ///
-pub fn list_items(user_id: Int, db: pgo.Connection) -> List(Item) {
+pub fn list_items(user_id: Int, db: sqlight.Connection) -> List(Item) {
   let sql =
     "
 select
@@ -188,20 +187,20 @@ order by
   inserted_at asc
 "
 
-  assert Ok(result) =
-    pgo.execute(
+  assert Ok(rows) =
+    sqlight.query(
       sql,
       on: db,
-      with: [pgo.int(user_id)],
+      with: [sqlight.int(user_id)],
       expecting: item_row_decoder(),
     )
 
-  result.rows
+  rows
 }
 
 /// Delete a specific item belonging to a user.
 ///
-pub fn delete_item(item_id: Int, user_id: Int, db: pgo.Connection) -> Bool {
+pub fn delete_item(item_id: Int, user_id: Int, db: sqlight.Connection) -> Nil {
   let sql =
     "
 delete from
@@ -211,14 +210,14 @@ where
 and
   user_id = $2
 "
-  assert Ok(result) =
-    pgo.execute(
+  assert Ok(_) =
+    sqlight.query(
       sql,
       on: db,
-      with: [pgo.int(item_id), pgo.int(user_id)],
+      with: [sqlight.int(item_id), sqlight.int(user_id)],
       expecting: Ok,
     )
-  result.count > 0
+  Nil
 }
 
 /// Update the content of a specific item belonging to a user.
@@ -227,7 +226,7 @@ pub fn update_item(
   item_id: Int,
   user_id: Int,
   content: String,
-  db: pgo.Connection,
+  db: sqlight.Connection,
 ) -> Result(Item, AppError) {
   let sql =
     "
@@ -244,14 +243,14 @@ returning
   completed,
   content
 "
-  assert Ok(result) =
-    pgo.execute(
+  assert Ok(rows) =
+    sqlight.query(
       sql,
       on: db,
-      with: [pgo.int(item_id), pgo.int(user_id), pgo.text(content)],
+      with: [sqlight.int(item_id), sqlight.int(user_id), sqlight.text(content)],
       expecting: item_row_decoder(),
     )
-  case result.rows {
+  case rows {
     [item] -> Ok(item)
     _ -> Error(error.NotFound)
   }
@@ -259,7 +258,7 @@ returning
 
 /// Delete a specific item belonging to a user.
 ///
-pub fn delete_completed(user_id: Int, db: pgo.Connection) -> Int {
+pub fn delete_completed(user_id: Int, db: sqlight.Connection) -> Nil {
   let sql =
     "
 delete from
@@ -269,9 +268,9 @@ where
 and
   completed = true
 "
-  assert Ok(result) =
-    pgo.execute(sql, on: db, with: [pgo.int(user_id)], expecting: Ok)
-  result.count
+  assert Ok(_) =
+    sqlight.query(sql, on: db, with: [sqlight.int(user_id)], expecting: Ok)
+  Nil
 }
 
 /// Toggle the completion state for specific item belonging to a user.
@@ -279,7 +278,7 @@ and
 pub fn toggle_completion(
   item_id: Int,
   user_id: Int,
-  db: pgo.Connection,
+  db: sqlight.Connection,
 ) -> Result(Item, AppError) {
   let sql =
     "
@@ -296,15 +295,15 @@ returning
   completed,
   content
 "
-  assert Ok(result) =
-    pgo.execute(
+  assert Ok(rows) =
+    sqlight.query(
       sql,
       on: db,
-      with: [pgo.int(item_id), pgo.int(user_id)],
+      with: [sqlight.int(item_id), sqlight.int(user_id)],
       expecting: item_row_decoder(),
     )
 
-  case result.rows {
+  case rows {
     [completed] -> Ok(completed)
     _ -> Error(error.NotFound)
   }
