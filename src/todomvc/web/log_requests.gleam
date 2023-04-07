@@ -10,8 +10,8 @@ fn format_log_line(
   response: Response(b),
   elapsed: Int,
 ) -> String {
-  let elapsed = case elapsed > 1_000 {
-    True -> string.append(int.to_string(elapsed / 1_000), "ms")
+  let elapsed = case elapsed > 1000 {
+    True -> string.append(int.to_string(elapsed / 1000), "ms")
     False -> string.append(int.to_string(elapsed), "µs")
   }
 

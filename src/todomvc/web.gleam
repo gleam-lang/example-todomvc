@@ -45,7 +45,7 @@ pub fn authenticate(
   let #(id, new_user) = case id {
     option.None -> {
       log.info("Creating a new user")
-      assert Ok(user) =
+      let assert Ok(user) =
         database.with_connection(
           db_name,
           fn(db) {

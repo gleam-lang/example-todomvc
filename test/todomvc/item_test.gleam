@@ -13,8 +13,8 @@ pub fn item_creation_test() {
   |> should.equal([])
 
   // Items can be added
-  assert Ok(id1) = item.insert_item("One", user_id, db)
-  assert Ok(id2) = item.insert_item("Two", user_id, db)
+  let assert Ok(id1) = item.insert_item("One", user_id, db)
+  let assert Ok(id2) = item.insert_item("Two", user_id, db)
 
   item.list_items(user_id, db)
   |> should.equal([
@@ -47,7 +47,7 @@ pub fn toggle_test() {
   let user_id = user.insert_user(db)
 
   // Items can be added
-  assert Ok(id1) = item.insert_item("One", user_id, db)
+  let assert Ok(id1) = item.insert_item("One", user_id, db)
 
   item.toggle_completion(id1, user_id, db)
   |> should.equal(Ok(Item(id: id1, completed: True, content: "One")))
@@ -69,7 +69,7 @@ pub fn toggle_user_mismatch_test() {
   let user_id2 = user.insert_user(db)
 
   // Items can be added
-  assert Ok(id1) = item.insert_item("One", user_id1, db)
+  let assert Ok(id1) = item.insert_item("One", user_id1, db)
 
   item.toggle_completion(id1, user_id2, db)
   |> should.equal(Error(error.NotFound))
@@ -83,19 +83,19 @@ pub fn counts_test() {
   item.get_counts(user_id1, db)
   |> should.equal(item.Counts(active: 0, completed: 0))
 
-  assert Ok(id1) = item.insert_item("x", user_id1, db)
-  assert Ok(id2) = item.insert_item("x", user_id1, db)
-  assert Ok(id3) = item.insert_item("x", user_id1, db)
-  assert Ok(_id) = item.insert_item("x", user_id1, db)
-  assert Ok(_id) = item.insert_item("x", user_id2, db)
-  assert Ok(_id) = item.insert_item("x", user_id2, db)
+  let assert Ok(id1) = item.insert_item("x", user_id1, db)
+  let assert Ok(id2) = item.insert_item("x", user_id1, db)
+  let assert Ok(id3) = item.insert_item("x", user_id1, db)
+  let assert Ok(_id) = item.insert_item("x", user_id1, db)
+  let assert Ok(_id) = item.insert_item("x", user_id2, db)
+  let assert Ok(_id) = item.insert_item("x", user_id2, db)
 
   item.get_counts(user_id1, db)
   |> should.equal(item.Counts(active: 4, completed: 0))
 
-  assert Ok(_) = item.toggle_completion(id1, user_id1, db)
-  assert Ok(_) = item.toggle_completion(id2, user_id1, db)
-  assert Ok(_) = item.toggle_completion(id3, user_id1, db)
+  let assert Ok(_) = item.toggle_completion(id1, user_id1, db)
+  let assert Ok(_) = item.toggle_completion(id2, user_id1, db)
+  let assert Ok(_) = item.toggle_completion(id3, user_id1, db)
 
   item.get_counts(user_id1, db)
   |> should.equal(item.Counts(active: 1, completed: 3))
@@ -104,7 +104,7 @@ pub fn counts_test() {
 pub fn delete_test() {
   use db <- tests.with_db("")
   let user_id = user.insert_user(db)
-  assert Ok(id) = item.insert_item("x", user_id, db)
+  let assert Ok(id) = item.insert_item("x", user_id, db)
 
   item.delete_item(id, user_id, db)
 
@@ -118,7 +118,7 @@ pub fn delete_other_users_item_test() {
   use db <- tests.with_db("")
   let user_id1 = user.insert_user(db)
   let user_id2 = user.insert_user(db)
-  assert Ok(id) = item.insert_item("x", user_id1, db)
+  let assert Ok(id) = item.insert_item("x", user_id1, db)
 
   // It belongs to someone else so it can't be deleted
   item.delete_item(id, user_id2, db)
@@ -133,17 +133,17 @@ pub fn delete_completed_test() {
   let user_id2 = user.insert_user(db)
 
   // Create a bunch of items for both users
-  assert Ok(id1) = item.insert_item("x", user_id1, db)
-  assert Ok(id2) = item.insert_item("x", user_id1, db)
-  assert Ok(id3) = item.insert_item("x", user_id1, db)
-  assert Ok(id4) = item.insert_item("x", user_id1, db)
-  assert Ok(id5) = item.insert_item("x", user_id2, db)
-  assert Ok(id6) = item.insert_item("x", user_id2, db)
+  let assert Ok(id1) = item.insert_item("x", user_id1, db)
+  let assert Ok(id2) = item.insert_item("x", user_id1, db)
+  let assert Ok(id3) = item.insert_item("x", user_id1, db)
+  let assert Ok(id4) = item.insert_item("x", user_id1, db)
+  let assert Ok(id5) = item.insert_item("x", user_id2, db)
+  let assert Ok(id6) = item.insert_item("x", user_id2, db)
 
   // Mark some items as completed for both users
-  assert Ok(_) = item.toggle_completion(id1, user_id1, db)
-  assert Ok(_) = item.toggle_completion(id2, user_id1, db)
-  assert Ok(_) = item.toggle_completion(id6, user_id2, db)
+  let assert Ok(_) = item.toggle_completion(id1, user_id1, db)
+  let assert Ok(_) = item.toggle_completion(id2, user_id1, db)
+  let assert Ok(_) = item.toggle_completion(id6, user_id2, db)
 
   // Delete completed items for the first user
   item.delete_completed(user_id1, db)
