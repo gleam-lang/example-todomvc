@@ -30,7 +30,7 @@ pub fn request(
 
 pub fn with_db(name: String, f: fn(sqlight.Connection) -> a) -> a {
   use db <- database.with_connection(name)
-  assert Ok(_) = database.migrate_schema(db)
+  let assert Ok(_) = database.migrate_schema(db)
   f(db)
 }
 
@@ -42,7 +42,7 @@ truncate
   items
 cascade
 "
-  assert Ok(_) = sqlight.query(sql, on: db, with: [], expecting: Ok)
+  let assert Ok(_) = sqlight.query(sql, on: db, with: [], expecting: Ok)
   Nil
 }
 

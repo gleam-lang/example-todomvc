@@ -16,7 +16,7 @@ insert into users
 default values 
 returning id;
 "
-  assert Ok([id]) =
+  let assert Ok([id]) =
     sqlight.query(
       sql,
       on: db,

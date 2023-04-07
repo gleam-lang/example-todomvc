@@ -10,10 +10,10 @@ pub fn home_test() {
   use db <- tests.with_db(name)
 
   let uid1 = user.insert_user(db)
-  assert Ok(_) = item.insert_item("Wibble", uid1, db)
-  assert Ok(_) = item.insert_item("Wobble", uid1, db)
+  let assert Ok(_) = item.insert_item("Wibble", uid1, db)
+  let assert Ok(_) = item.insert_item("Wobble", uid1, db)
   let uid2 = user.insert_user(db)
-  assert Ok(_) = item.insert_item("Wabble", uid2, db)
+  let assert Ok(_) = item.insert_item("Wabble", uid2, db)
 
   let response =
     tests.request(http.Get, path: [], body: "", user_id: uid1, db: name)

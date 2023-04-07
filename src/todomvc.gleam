@@ -14,13 +14,14 @@ pub fn main() {
   let port = load_port()
   let application_secret = load_application_secret()
   let db = "todomvc.sqlite3"
-  assert Ok(_) = database.with_connection(db, database.migrate_schema)
+  let assert Ok(_) = database.with_connection(db, database.migrate_schema)
   let handler = routes.app(_, application_secret, db)
 
   string.concat(["Listening on http://localhost:", int.to_string(port), " ✨"])
   |> log.info
 
-  assert Ok(_) = mist.run_service(port, handler, max_body_limit: 4_000_000_000)
+  let assert Ok(_) =
+    mist.run_service(port, handler, max_body_limit: 4_000_000_000)
   process.sleep_forever()
 }
 

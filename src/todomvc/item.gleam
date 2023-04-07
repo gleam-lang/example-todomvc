@@ -47,7 +47,7 @@ group by
 order by
   completed asc
 "
-  assert Ok(rows) =
+  let assert Ok(rows) =
     sqlight.query(
       sql,
       on: db,
@@ -81,7 +81,7 @@ values
 returning
   id
 "
-  try rows =
+  use rows <- result.then(
     sqlight.query(
       sql,
       on: db,
@@ -95,9 +95,10 @@ returning
         sqlight.ConstraintForeignkey, _ -> error.UserNotFound
         _, _ -> error.BadRequest
       }
-    })
+    }),
+  )
 
-  assert [id] = rows
+  let assert [id] = rows
   Ok(id)
 }
 
@@ -122,7 +123,7 @@ and
   user_id = $2
 "
 
-  assert Ok(rows) =
+  let assert Ok(rows) =
     sqlight.query(
       sql,
       on: db,
@@ -159,7 +160,7 @@ order by
   inserted_at asc
 "
 
-  assert Ok(rows) =
+  let assert Ok(rows) =
     sqlight.query(
       sql,
       on: db,
@@ -187,7 +188,7 @@ order by
   inserted_at asc
 "
 
-  assert Ok(rows) =
+  let assert Ok(rows) =
     sqlight.query(
       sql,
       on: db,
@@ -210,7 +211,7 @@ where
 and
   user_id = $2
 "
-  assert Ok(_) =
+  let assert Ok(_) =
     sqlight.query(
       sql,
       on: db,
@@ -243,7 +244,7 @@ returning
   completed,
   content
 "
-  assert Ok(rows) =
+  let assert Ok(rows) =
     sqlight.query(
       sql,
       on: db,
@@ -268,7 +269,7 @@ where
 and
   completed = true
 "
-  assert Ok(_) =
+  let assert Ok(_) =
     sqlight.query(sql, on: db, with: [sqlight.int(user_id)], expecting: Ok)
   Nil
 }
@@ -295,7 +296,7 @@ returning
   completed,
   content
 "
-  assert Ok(rows) =
+  let assert Ok(rows) =
     sqlight.query(
       sql,
       on: db,
