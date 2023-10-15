@@ -28,5 +28,5 @@ pub fn middleware(
   }
 }
 
-external fn priv_directory() -> String =
-  "todomvc_ffi" "priv_directory"
+@external(erlang, "todomvc_ffi", "priv_directory")
+fn priv_directory() -> String

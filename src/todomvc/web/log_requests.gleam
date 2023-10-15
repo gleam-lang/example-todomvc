@@ -41,8 +41,8 @@ type TimeUnit {
   Microsecond
 }
 
-external fn now() -> Int =
-  "erlang" "monotonic_time"
+@external(erlang, "erlang", "monotonic_time")
+fn now() -> Int
 
-external fn convert_time_unit(Int, TimeUnit, TimeUnit) -> Int =
-  "erlang" "convert_time_unit"
+@external(erlang, "erlang", "convert_time_unit")
+fn convert_time_unit(time: Int, from: TimeUnit, to: TimeUnit) -> Int
