@@ -46,5 +46,5 @@ cascade
   Nil
 }
 
-pub external fn ensure(run: fn() -> a, afterwards: fn() -> b) -> a =
-  "todomvc_test_helper" "ensure"
+@external(erlang, "todomvc_test_helper", "ensure")
+pub fn ensure(run: fn() -> a, afterwards: fn() -> b) -> a
