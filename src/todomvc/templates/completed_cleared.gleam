@@ -15,7 +15,12 @@ pub fn render_builder(
     string_builder.append(
       builder,
       "
-
+",
+    )
+  let builder =
+    string_builder.append(
+      builder,
+      "
 <ul hx-swap-oob=\"innerHTML\" id=\"todo-list\">
   ",
     )

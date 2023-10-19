@@ -10,7 +10,12 @@ pub fn render_builder(counts counts: Counts) -> StringBuilder {
     string_builder.append(
       builder,
       "
-
+",
+    )
+  let builder =
+    string_builder.append(
+      builder,
+      "
 <div hx-swap-oob=\"innerHTML\" id=\"clear-completed\">
   ",
     )
@@ -30,9 +35,12 @@ pub fn render_builder(counts counts: Counts) -> StringBuilder {
           ")
   ",
         )
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(

@@ -16,7 +16,12 @@ pub fn render_builder(
     string_builder.append(
       builder,
       "
-
+",
+    )
+  let builder =
+    string_builder.append(
+      builder,
+      "
 <!DOCTYPE html>
 <html lang=\"en\">
 <head>
@@ -128,9 +133,12 @@ pub fn render_builder(
   let builder = case category == item.All {
     True -> {
       let builder = string_builder.append(builder, "selected")
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(
@@ -143,9 +151,12 @@ pub fn render_builder(
   let builder = case category == item.Active {
     True -> {
       let builder = string_builder.append(builder, "selected")
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(
@@ -158,9 +169,12 @@ pub fn render_builder(
   let builder = case category == item.Completed {
     True -> {
       let builder = string_builder.append(builder, "selected")
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(
@@ -192,9 +206,12 @@ pub fn render_builder(
           ")
           ",
         )
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(

@@ -3,31 +3,21 @@
 
 import gleam/http.{Http}
 import gleam/http/cookie
-import gleam/http/response.{Response}
-import gleam/http/request.{Request}
-import gleam/uri
-import gleam/string_builder.{StringBuilder}
-import gleam/option.{Option}
-import gleam/string
+import gleam/http/response
+import gleam/option
 import gleam/result
 import gleam/list
 import gleam/int
-import gleam/crypto
 import todomvc/error.{AppError}
 import todomvc/user
-import todomvc/log
 import todomvc/database
+import wisp.{Request, Response}
 
-pub type AppRequest {
-  AppRequest(
-    method: http.Method,
-    path: List(String),
-    headers: List(#(String, String)),
-    body: String,
-    db: String,
-    user_id: Int,
-  )
+pub type Context {
+  Context(db: database.Connection, user_id: Int, static_path: String)
 }
+
+const uid_cookie = "uid"
 
 /// Load the user from the `uid` cookie if set, otherwise create a new user row
 /// and assign that in the response cookies.
@@ -35,83 +25,47 @@ pub type AppRequest {
 /// The `uid` cookie is signed to prevent tampering.
 ///
 pub fn authenticate(
-  request: Request(String),
-  secret: String,
-  db_name: String,
-  next: fn(AppRequest) -> Response(StringBuilder),
-) -> Response(StringBuilder) {
-  use id <- user_id_from_cookies(request, secret)
+  req: Request,
+  ctx: Context,
+  next: fn(Context) -> Response,
+) -> Response {
+  let id =
+    wisp.get_cookie(req, uid_cookie, wisp.Signed)
+    |> result.try(int.parse)
+    |> option.from_result
 
   let #(id, new_user) = case id {
     option.None -> {
-      log.info("Creating a new user")
-      let assert Ok(user) =
-        database.with_connection(
-          db_name,
-          fn(db) {
-            let id = user.insert_user(db)
-            Ok(id)
-          },
-        )
+      wisp.log_info("Creating a new user")
+      let user = user.insert_user(ctx.db)
       #(user, True)
     }
     option.Some(id) -> #(id, False)
   }
-
-  let response =
-    next(AppRequest(
-      method: request.method,
-      path: request.path_segments(request),
-      headers: request.headers,
-      body: request.body,
-      db: db_name,
-      user_id: id,
-    ))
+  let context = Context(..ctx, user_id: id)
+  let resp = next(context)
 
   case new_user {
-    True ->
-      <<int.to_string(id):utf8>>
-      |> crypto.sign_message(<<secret:utf8>>, crypto.Sha256)
-      |> response.set_cookie(response, "uid", _, cookie.defaults(Http))
-    False -> response
-  }
-}
-
-/// Fetch the current user's id number from the `uid` cookie, returning `None`
-/// if there is none.
-///
-/// The cookie's value is signed and if it is found to have been tampered with
-/// then an error is returned.
-///
-pub fn user_id_from_cookies(
-  request: Request(a),
-  secret: String,
-  next: fn(Option(Int)) -> Response(StringBuilder),
-) -> Response(StringBuilder) {
-  case list.key_find(request.get_cookies(request), "uid") {
-    Ok(id) ->
-      case user.verify_cookie_id(id, secret) {
-        Ok(id) -> next(option.Some(id))
-        Error(_) -> bad_request()
-      }
-    Error(_) -> next(option.None)
+    True -> {
+      let id = int.to_string(id)
+      let year = 60 * 60 * 24 * 365
+      wisp.set_cookie(resp, req, uid_cookie, id, wisp.Signed, year)
+    }
+    False -> resp
   }
 }
 
 pub type AppResult =
-  Result(Response(StringBuilder), AppError)
+  Result(Response, AppError)
 
-pub fn result_to_response(result: AppResult) -> Response(StringBuilder) {
+pub fn result_to_response(result: AppResult) -> Response {
   case result {
     Ok(response) -> response
     Error(error) -> error_to_response(error)
   }
 }
 
-pub fn try_(
-  result: Result(t, AppError),
-  next: fn(t) -> Response(StringBuilder),
-) -> Response(StringBuilder) {
+pub fn try_(result: Result(t, AppError), next: fn(t) -> Response) -> Response {
   case result {
     Ok(t) -> next(t)
     Error(error) -> error_to_response(error)
@@ -120,76 +74,23 @@ pub fn try_(
 
 /// Return an appropriate HTTP response for a given error.
 ///
-pub fn error_to_response(error: AppError) -> Response(StringBuilder) {
+pub fn error_to_response(error: AppError) -> Response {
   case error {
     error.UserNotFound -> user_not_found()
-    error.NotFound -> not_found()
-    error.MethodNotAllowed -> method_not_allowed()
-    error.BadRequest -> bad_request()
-    error.UnprocessableEntity | error.ContentRequired -> unprocessable_entity()
-    error.SqlightError(_) -> internal_server_error()
+    error.NotFound -> wisp.not_found()
+    error.MethodNotAllowed -> wisp.method_not_allowed([])
+    error.BadRequest -> wisp.bad_request()
+    error.UnprocessableEntity | error.ContentRequired ->
+      wisp.unprocessable_entity()
+    error.SqlightError(_) -> wisp.internal_server_error()
   }
 }
 
-pub fn html_response(
-  html: StringBuilder,
-  status: Int,
-) -> Response(StringBuilder) {
-  response.new(status)
-  |> response.prepend_header("content-type", "text/html")
-  |> response.set_body(html)
-}
-
-pub fn escape(text: String) -> String {
-  text
-  |> string.replace("&", "&amp;")
-  |> string.replace("<", "&lt;")
-  |> string.replace(">", "&gt;")
-  |> string.replace("\"", "&quot;")
-}
-
-pub fn not_found() -> Response(StringBuilder) {
-  let body = string_builder.from_string("There's nothing here...")
-  response.new(404)
-  |> response.set_body(body)
-}
-
-pub fn user_not_found() -> Response(StringBuilder) {
+pub fn user_not_found() -> Response {
   let attributes =
     cookie.Attributes(..cookie.defaults(Http), max_age: option.Some(0))
-  not_found()
+  wisp.not_found()
   |> response.set_cookie("uid", "", attributes)
-}
-
-pub fn method_not_allowed() -> Response(StringBuilder) {
-  let body = string_builder.from_string("There's nothing here...")
-  response.new(405)
-  |> response.set_body(body)
-}
-
-pub fn bad_request() -> Response(StringBuilder) {
-  let body = string_builder.from_string("Bad request")
-  response.new(400)
-  |> response.set_body(body)
-}
-
-pub fn internal_server_error() -> Response(StringBuilder) {
-  let body = string_builder.from_string("Internal server error. Sorry!")
-  response.new(500)
-  |> response.set_body(body)
-}
-
-pub fn unprocessable_entity() -> Response(StringBuilder) {
-  let body = string_builder.from_string("Unprocessable entity")
-  response.new(422)
-  |> response.set_body(body)
-}
-
-pub fn parse_urlencoded_body(
-  request: AppRequest,
-) -> Result(List(#(String, String)), AppError) {
-  uri.parse_query(request.body)
-  |> result.replace_error(error.BadRequest)
 }
 
 pub fn key_find(list: List(#(k, v)), key: k) -> Result(v, AppError) {
@@ -204,12 +105,9 @@ pub fn parse_int(string: String) -> Result(Int, AppError) {
   |> result.replace_error(error.BadRequest)
 }
 
-pub fn ensure_method(
-  request: AppRequest,
-  method: http.Method,
-) -> Result(Nil, AppError) {
-  case request.method == method {
-    True -> Ok(Nil)
-    False -> Error(error.MethodNotAllowed)
+pub fn require_ok(t: Result(t, AppError), next: fn(t) -> Response) -> Response {
+  case t {
+    Ok(t) -> next(t)
+    Error(error) -> error_to_response(error)
   }
 }

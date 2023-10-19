@@ -1,27 +1,35 @@
-import todomvc/web/routes
+import todomvc/router
 import todomvc/database
-import todomvc/log
+import todomvc/web.{Context}
 import gleam/int
-import gleam/string
 import gleam/result
 import gleam/erlang/os
 import gleam/erlang/process
 import mist
+import wisp
+
+const db_name = "todomvc.sqlite3"
 
 pub fn main() {
-  log.configure_backend()
+  wisp.configure_logger()
 
   let port = load_port()
-  let application_secret = load_application_secret()
-  let db = "todomvc.sqlite3"
-  let assert Ok(_) = database.with_connection(db, database.migrate_schema)
-  let handler = routes.app(_, application_secret, db)
+  let secret_key_base = load_application_secret()
+  let assert Ok(priv) = wisp.priv_directory("todomvc")
+  let assert Ok(_) = database.with_connection(db_name, database.migrate_schema)
 
-  string.concat(["Listening on http://localhost:", int.to_string(port), " ✨"])
-  |> log.info
+  let handle_request = fn(req) {
+    use db <- database.with_connection(db_name)
+    let ctx = Context(user_id: 0, db: db, static_path: priv <> "/static")
+    router.handle_request(req, ctx)
+  }
 
   let assert Ok(_) =
-    mist.run_service(port, handler, max_body_limit: 4_000_000_000)
+    wisp.mist_handler(handle_request, secret_key_base)
+    |> mist.new
+    |> mist.port(port)
+    |> mist.start_http
+
   process.sleep_forever()
 }
 

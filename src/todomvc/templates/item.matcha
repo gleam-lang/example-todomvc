@@ -1,9 +1,9 @@
 {> with item as Item
 {> with editing as Bool
 
-{> import todomvc/item.{Item}
-{> import todomvc/web
 {> import gleam/int
+{> import todomvc/item.{Item}
+{> import wisp
 
 <li 
   id="item-{{ int.to_string(item.id) }}"
@@ -18,7 +18,7 @@
     >
 
     <label>
-      {{ web.escape(item.content) }}
+      {{ wisp.escape_html(item.content) }}
     </label>
 
     <a
@@ -54,7 +54,7 @@
     class="edit"
     type="text"
     name="content"
-    value="{{ web.escape(item.content) }}"
+    value="{{ wisp.escape_html(item.content) }}"
     hx-patch="/todos/{{ int.to_string(item.id) }}"
     hx-target="#item-{{ int.to_string(item.id) }}"
     hx-swap="outerHTML"

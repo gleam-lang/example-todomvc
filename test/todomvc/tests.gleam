@@ -1,31 +1,11 @@
 import sqlight
-import gleam/string_builder
-import gleam/http
-import gleam/http/response.{Response}
 import todomvc/database
-import todomvc/web
-import todomvc/web/routes
+import todomvc/web.{Context}
 
-pub fn request(
-  method method: http.Method,
-  path path: List(String),
-  body body: String,
-  user_id user_id: Int,
-  db db: String,
-) -> Response(String) {
-  let response =
-    web.AppRequest(
-      method: method,
-      path: path,
-      body: body,
-      headers: [],
-      user_id: user_id,
-      db: db,
-    )
-    |> routes.router
-
-  response
-  |> response.map(string_builder.to_string)
+pub fn with_context(test: fn(Context) -> t) -> t {
+  use db <- with_db("")
+  let context = Context(db: db, user_id: 0, static_path: "priv/static")
+  test(context)
 }
 
 pub fn with_db(name: String, f: fn(sqlight.Connection) -> a) -> a {
@@ -33,18 +13,3 @@ pub fn with_db(name: String, f: fn(sqlight.Connection) -> a) -> a {
   let assert Ok(_) = database.migrate_schema(db)
   f(db)
 }
-
-pub fn truncate_db(db: sqlight.Connection) -> Nil {
-  let sql =
-    "
-truncate
-  users,
-  items
-cascade
-"
-  let assert Ok(_) = sqlight.query(sql, on: db, with: [], expecting: Ok)
-  Nil
-}
-
-@external(erlang, "todomvc_test_helper", "ensure")
-pub fn ensure(run: fn() -> a, afterwards: fn() -> b) -> a

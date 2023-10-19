@@ -15,7 +15,12 @@ pub fn render_builder(
     string_builder.append(
       builder,
       "
-
+",
+    )
+  let builder =
+    string_builder.append(
+      builder,
+      "
 <input
   autofocus 
   required 
@@ -49,9 +54,12 @@ pub fn render_builder(
 </div>
 ",
         )
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(
@@ -77,9 +85,12 @@ pub fn render_builder(
           ")
   ",
         )
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(

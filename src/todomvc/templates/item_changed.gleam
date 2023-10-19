@@ -15,7 +15,12 @@ pub fn render_builder(
     string_builder.append(
       builder,
       "
-
+",
+    )
+  let builder =
+    string_builder.append(
+      builder,
+      "
 ",
     )
   let builder = case display {
@@ -37,9 +42,12 @@ pub fn render_builder(
           "
 ",
         )
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(
@@ -65,9 +73,12 @@ pub fn render_builder(
           ")
   ",
         )
+
       builder
     }
-    False -> builder
+    False -> {
+      builder
+    }
   }
   let builder =
     string_builder.append(
