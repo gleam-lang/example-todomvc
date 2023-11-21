@@ -11,7 +11,6 @@ import todomvc/templates/completed_cleared as completed_cleared_template
 import todomvc/item.{type Category, Item}
 import todomvc/web.{type Context}
 import wisp.{type Request, type Response}
-import gleam/io
 
 pub fn handle_request(req: Request, ctx: Context) -> Response {
   let req = wisp.method_override(req)
@@ -20,8 +19,6 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
   use req <- wisp.handle_head(req)
   use ctx <- web.authenticate(req, ctx)
   use <- wisp.serve_static(req, under: "/", from: ctx.static_path)
-
-  io.debug(req)
 
   case wisp.path_segments(req) {
     [] -> home(ctx, item.All)

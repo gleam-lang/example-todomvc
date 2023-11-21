@@ -41,7 +41,7 @@ select
 from
   items
 where
-  items.user_id = $1
+  items.user_id = ?1
 group by
   completed
 order by
@@ -77,7 +77,7 @@ pub fn insert_item(
 insert into items
   (content, user_id) 
 values 
-  ($1, $2)
+  (?1, ?2)
 returning
   id
 "
@@ -118,9 +118,9 @@ select
 from
   items
 where
-  id = $1
+  id = ?1
 and
-  user_id = $2
+  user_id = ?2
 "
 
   let assert Ok(rows) =
@@ -153,9 +153,9 @@ select
 from
   items
 where
-  user_id = $1
+  user_id = ?1
 and
-  completed = $2
+  completed = ?2
 order by
   inserted_at asc
 "
@@ -183,7 +183,7 @@ select
 from
   items
 where
-  user_id = $1
+  user_id = ?1
 order by
   inserted_at asc
 "
@@ -207,9 +207,9 @@ pub fn delete_item(item_id: Int, user_id: Int, db: sqlight.Connection) -> Nil {
 delete from
   items
 where
-  id = $1
+  id = ?1
 and
-  user_id = $2
+  user_id = ?2
 "
   let assert Ok(_) =
     sqlight.query(
@@ -234,11 +234,11 @@ pub fn update_item(
 update
   items
 set
-  content = $3
+  content = ?3
 where
-  id = $1
+  id = ?1
 and
-  user_id = $2
+  user_id = ?2
 returning
   id,
   completed,
@@ -265,7 +265,7 @@ pub fn delete_completed(user_id: Int, db: sqlight.Connection) -> Nil {
 delete from
   items
 where
-  user_id = $1
+  user_id = ?1
 and
   completed = true
 "
@@ -288,9 +288,9 @@ update
 set
   completed = not completed
 where
-  id = $1
+  id = ?1
 and
-  user_id = $2
+  user_id = ?2
 returning
   id,
   completed,
