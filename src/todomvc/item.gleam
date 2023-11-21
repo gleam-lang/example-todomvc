@@ -3,7 +3,7 @@ import gleam/list
 import gleam/bool
 import gleam/result
 import gleam/dynamic
-import todomvc/error.{AppError}
+import todomvc/error.{type AppError}
 
 pub type Item {
   Item(id: Int, completed: Bool, content: String)

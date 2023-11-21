@@ -8,10 +8,10 @@ import gleam/option
 import gleam/result
 import gleam/list
 import gleam/int
-import todomvc/error.{AppError}
+import todomvc/error.{type AppError}
 import todomvc/user
 import todomvc/database
-import wisp.{Request, Response}
+import wisp.{type Request, type Response}
 
 pub type Context {
   Context(db: database.Connection, user_id: Int, static_path: String)

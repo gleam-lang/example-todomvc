@@ -1,6 +1,6 @@
 import sqlight
 import todomvc/database
-import todomvc/web.{Context}
+import todomvc/web.{type Context, Context}
 
 pub fn with_context(test: fn(Context) -> t) -> t {
   use db <- with_db("")

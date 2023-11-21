@@ -1,4 +1,4 @@
-import todomvc/error.{AppError}
+import todomvc/error.{type AppError}
 import gleam/result
 import sqlight
 
