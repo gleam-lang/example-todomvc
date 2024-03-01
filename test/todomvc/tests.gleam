@@ -2,10 +2,10 @@ import sqlight
 import todomvc/database
 import todomvc/web.{type Context, Context}
 
-pub fn with_context(test: fn(Context) -> t) -> t {
+pub fn with_context(testcase: fn(Context) -> t) -> t {
   use db <- with_db("")
   let context = Context(db: db, user_id: 0, static_path: "priv/static")
-  test(context)
+  testcase(context)
 }
 
 pub fn with_db(name: String, f: fn(sqlight.Connection) -> a) -> a {

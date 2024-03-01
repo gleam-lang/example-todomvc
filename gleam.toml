@@ -14,10 +14,10 @@ gleam = ">= 0.32.0"
 gleam_stdlib = "~> 0.31"
 gleam_http = "~> 3.5"
 gleam_erlang = "~> 0.22"
-gleam_crypto = "~> 0.4"
+gleam_crypto = "~> 1.0"
 mist = "~> 0.14"
 sqlight = "~> 0.8"
 wisp = "~> 0.5"
 
 [dev-dependencies]
-gleeunit = "~> 0.11"
+gleeunit = "~> 1.0"
