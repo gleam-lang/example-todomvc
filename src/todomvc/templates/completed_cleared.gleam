@@ -25,31 +25,27 @@ pub fn render_builder(
   ",
     )
   let builder =
-    list.fold(
-      items,
-      builder,
-      fn(builder, item: Item) {
-        let builder =
-          string_builder.append(
-            builder,
-            "
+    list.fold(items, builder, fn(builder, item: Item) {
+      let builder =
+        string_builder.append(
+          builder,
+          "
   ",
-          )
-        let builder =
-          string_builder.append_builder(
-            builder,
-            item_template.render_builder(item, False),
-          )
-        let builder =
-          string_builder.append(
-            builder,
-            "
+        )
+      let builder =
+        string_builder.append_builder(
+          builder,
+          item_template.render_builder(item, False),
+        )
+      let builder =
+        string_builder.append(
+          builder,
+          "
   ",
-          )
+        )
 
-        builder
-      },
-    )
+      builder
+    })
   let builder =
     string_builder.append(
       builder,
