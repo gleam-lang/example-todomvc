@@ -1,14 +1,14 @@
 import gleam/http
 import gleam/list
-import gleam/string
 import gleam/result
+import gleam/string
+import todomvc/item.{type Category, Item}
+import todomvc/templates/completed_cleared as completed_cleared_template
 import todomvc/templates/home as home_template
 import todomvc/templates/item as item_template
-import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_changed as item_changed_template
+import todomvc/templates/item_created as item_created_template
 import todomvc/templates/item_deleted as item_deleted_template
-import todomvc/templates/completed_cleared as completed_cleared_template
-import todomvc/item.{type Category, Item}
 import todomvc/web.{type Context}
 import wisp.{type Request, type Response}
 

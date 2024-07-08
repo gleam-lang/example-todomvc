@@ -1,6 +1,6 @@
-import todomvc/error.{type AppError}
 import gleam/result
 import sqlight
+import todomvc/error.{type AppError}
 
 pub type Connection =
   sqlight.Connection

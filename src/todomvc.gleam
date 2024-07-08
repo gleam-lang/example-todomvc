@@ -1,11 +1,11 @@
-import todomvc/router
-import todomvc/database
-import todomvc/web.{Context}
-import gleam/int
-import gleam/result
 import gleam/erlang/os
 import gleam/erlang/process
+import gleam/int
+import gleam/result
 import mist
+import todomvc/database
+import todomvc/router
+import todomvc/web.{Context}
 import wisp
 
 const db_name = "todomvc.sqlite3"

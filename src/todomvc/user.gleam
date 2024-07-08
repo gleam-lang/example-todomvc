@@ -1,5 +1,5 @@
-import sqlight
 import gleam/dynamic
+import sqlight
 
 /// Insert a new user, returning their id.
 ///

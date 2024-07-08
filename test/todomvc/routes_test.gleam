@@ -1,12 +1,12 @@
-import gleam/string
 import gleam/int
+import gleam/string
 import gleeunit/should
 import todomvc/item
 import todomvc/router
 import todomvc/tests
 import todomvc/user
-import wisp/testing
 import wisp
+import wisp/testing
 
 pub fn home_test() {
   use ctx <- tests.with_context
