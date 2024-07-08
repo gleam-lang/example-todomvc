@@ -4,13 +4,13 @@
 import gleam/http.{Http}
 import gleam/http/cookie
 import gleam/http/response
+import gleam/int
+import gleam/list
 import gleam/option
 import gleam/result
-import gleam/list
-import gleam/int
+import todomvc/database
 import todomvc/error.{type AppError}
 import todomvc/user
-import todomvc/database
 import wisp.{type Request, type Response}
 
 pub type Context {

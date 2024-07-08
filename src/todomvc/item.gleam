@@ -1,8 +1,8 @@
-import sqlight
-import gleam/list
 import gleam/bool
-import gleam/result
 import gleam/dynamic
+import gleam/list
+import gleam/result
+import sqlight
 import todomvc/error.{type AppError}
 
 pub type Item {

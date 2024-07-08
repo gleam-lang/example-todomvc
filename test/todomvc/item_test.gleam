@@ -1,8 +1,8 @@
-import todomvc/tests
-import todomvc/item.{Item}
-import todomvc/user
-import todomvc/error
 import gleeunit/should
+import todomvc/error
+import todomvc/item.{Item}
+import todomvc/tests
+import todomvc/user
 
 pub fn item_creation_test() {
   use db <- tests.with_db("")
