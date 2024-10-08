@@ -7,6 +7,7 @@ import todomvc/database
 import todomvc/router
 import todomvc/web.{Context}
 import wisp
+import wisp/wisp_mist
 
 const db_name = "todomvc.sqlite3"
 
@@ -25,7 +26,7 @@ pub fn main() {
   }
 
   let assert Ok(_) =
-    wisp.mist_handler(handle_request, secret_key_base)
+    wisp_mist.handler(handle_request, secret_key_base)
     |> mist.new
     |> mist.port(port)
     |> mist.start_http
@@ -43,3 +44,4 @@ fn load_port() -> Int {
   |> result.then(int.parse)
   |> result.unwrap(3000)
 }
+
